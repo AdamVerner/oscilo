@@ -22,3 +22,6 @@ application will be of modular design, meaning that the application should have 
 
 
 
+
+#### firmware
+here is the fpga project with all it's files and sources
