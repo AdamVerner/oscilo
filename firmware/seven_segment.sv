@@ -16,18 +16,23 @@ module seven_segment(
     output reg[3:0] dsen;
 
     reg [3:0] faze;
-    reg [3:0] SevenSeg;
+    reg [7:0] SevenSeg;
 
     initial begin
         faze = 1;
     end
 
 
-
     always @(posedge clk)
     begin
-
-        SevenSeg = {segA, segB, segC, segD, segE, segF, segG};
+   
+        assign segA = SevenSeg[6];
+        assign segB = SevenSeg[5];
+        assign segC = SevenSeg[4];
+        assign segD = SevenSeg[3];
+        assign segE = SevenSeg[2];
+        assign segF = SevenSeg[1];
+        assign segG = SevenSeg[0];
 
         case(faze)
             8'h0: begin
