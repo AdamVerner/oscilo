@@ -51,9 +51,10 @@ module test;
     
   end
 
-  task clk begin
+  task clk;
     #1 clk = ~clk;
     #1 clk = ~clk;
+
   endtask
 
 
