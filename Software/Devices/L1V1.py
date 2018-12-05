@@ -1,4 +1,4 @@
-#/bin/env python3
+# /bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -12,13 +12,12 @@ Main class for handlng communication with FPGA Board
 import serial
 
 
-class Oscilo(object):
+class Device(object):
 	"""
-	same as what topmodule doc says
 	"""
-	
+
 	available = False
-	
+
 	def __init__(self, port):
 		"""
 		initializes USB serial commincation port
@@ -30,8 +29,7 @@ class Oscilo(object):
 		
 		avalable = True
 		#end
-		
-	
+
 	def destroy(self):
 		"""
 		cleans up device
