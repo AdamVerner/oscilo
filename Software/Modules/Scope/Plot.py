@@ -1,10 +1,23 @@
-
-
-#!/usr/bin/env python
-# coding=utf-8
+#!/usr/bin/env/ python3
+# -*- coding: utf-8 -*-
 """
-Drawing Plot and plotting the right values
+|----------------------------------------------------------|
+|             ,--|--.                                      |
+|          ,-'       `-.                                   |
+|        ,'      |      `.                                 |
+|      ,'                 `.                               |
+|     /          |          \                              |
+|    /                       \                           / |
+|- - - - - - - - + - - - - - -\- - - - - - - - - - - - -/- |
+|                              \                       /   |
+|                |              \                     /    |
+|                                `.                 ,'     |
+|                |                 `.             ,'       |
+|                                    `-.       ,-'         |
+|                |                      `--,--'            |
+|----------------------------------------------------------|
 """
+
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
@@ -13,44 +26,60 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+
 class Plot(Gtk.Box):
 
-    def __init__(self, size=(400, 400)):
+    graph_properties = {
+        'linestyle': '-',
+        'marker': 'o',
+    }
 
+    def __init__(self, size=(400, 400)):
         self.size = size
         Gtk.Box.__init__(self)
 
         fig = Figure()
-        self.ax = fig.add_subplot(111, facecolor='black')
-        
-        self.ax.plot((1, 2, 3, 4), (1, 2, 3, 4))
+
+        self.ax = fig.add_subplot(111, fc='black')
+
+        self.ax.grid(True, 'both', 'both')
+
+        y = [0, 1, 2, 3, 2.57]
+
+        self.ax.plot(range(len(y)), y, **self.graph_properties)
 
         canvas = FigureCanvas(fig)
         canvas.set_size_request(*size)
         self.add(canvas)
 
-
-    # pres celou rozlohu pridat plot
-    # z plotu odebrat popisky (asi)
-    # zmenit pozadi plotu
-    # pridat divisions
-    # udelat spojity graf
+    # TODO z plotu odebrat popisky (asi)
+    # TODO zmenit pozadi plotu
+    # TODO pridat divisions
+    # TODO zmensit velikost bodu
 
     def update(self, values):
 
         self.ax.clear()
-        self.ax.scatter(*values)
-        self.ax.plot()
+        self.ax.grid(True, 'both', 'both')
+        self.ax.plot(*values, **self.graph_properties)
+        self.queue_draw()
 
 
 if __name__ == '__main__':
-
-    window = Gtk.Window()
-    window.connect("delete-event", Gtk.main_quit)
-    window.set_default_size(400, 400)
+    from TestUtil import test_util
 
     p = Plot()
 
-    window.add(p)
-    window.show_all()
-    Gtk.main()
+    def t1(*_, **__):
+        print('t1')
+        x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        y = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        p.update([x, y])
+
+    def t2(*_, **__):
+        print('t2')
+        x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        y = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+        p.update([x, y])
+
+    test_util(p, t1, t2)
