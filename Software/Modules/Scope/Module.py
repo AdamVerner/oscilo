@@ -32,7 +32,7 @@ class Module(Gtk.Grid):
         Gtk.Grid.__init__(self)
 
         self.plot = Plot()
-        self.settings = Settings()
+        self.settings = Settings(self.device)
         self.signals = Signals()
 
         self.attach(self.plot, 0, 0, 1, 1)

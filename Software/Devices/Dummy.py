@@ -22,6 +22,8 @@ class Device(object):
     _state = STATE_INIT
 
     sample_speed = 2
+    _trigger_mode = 'RISING'
+    _trigger_level = 128
 
     def __init__(self):
         self.log_data = list()  # each line is one information of device log
@@ -67,6 +69,25 @@ class Device(object):
         # TODO add timestamps
         print(info)
         self.log_data.append(info)
+
+    @property
+    def trigger_mode(self):
+        return self._trigger_mode  # TODO poll from device
+
+    @trigger_mode.setter
+    def trigger_mode(self, mode):
+        self.log('trigger mode has been set to: %s' % mode)
+        # TODO verify if mode is legit
+        self._trigger_mode = mode
+
+    @property
+    def trigger_level(self):
+        return self._trigger_level  # TODO poll from device
+
+    @trigger_level.setter
+    def trigger_level(self, level):
+        self.log('trigger level has been set to: %f' % level)
+        self._trigger_level = level
 
 
 if __name__ == '__main__':
