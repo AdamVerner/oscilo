@@ -7,6 +7,8 @@ always replies with same waveforms and so on....
 """
 
 import numpy as np
+from time import sleep
+from multiprocessing import Process
 
 from Exceptions import OutOfInitState
 
@@ -22,8 +24,24 @@ class Device(object):
     _state = STATE_INIT
 
     sample_speed = 2
+
     _trigger_mode = 'RISING'
+    _trigger_modes = ['RISING', 'FALLING', 'BOTH']
     _trigger_level = 128
+    trig_max = 255
+    trig_min = 0
+    trig_step = 1
+
+    # Variable Gain Amplifier
+    vga_level = 0  # TODO add setter and getter functions
+    vga_max = 255
+    vga_min = 0
+    vga_step = 4
+
+    # attenuator settings
+    att_level = 0  # TODO add setter and getter functions
+    # att usually doesn't have that level-variability as vga, so store the values in list
+    att_steps = [1, 4, 10, 20]
 
     def __init__(self):
         self.log_data = list()  # each line is one information of device log
@@ -81,13 +99,35 @@ class Device(object):
         self._trigger_mode = mode
 
     @property
-    def trigger_level(self):
+    def trig_lvl(self):
         return self._trigger_level  # TODO poll from device
 
-    @trigger_level.setter
-    def trigger_level(self, level):
+    @trig_lvl.setter
+    def trig_lvl(self, level):
         self.log('trigger level has been set to: %f' % level)
         self._trigger_level = level
+
+    def activate_scope(self, sampling_callback, done_callback):
+        """
+        :param sampling_callback: function to call when the scope transitions into post_trigger
+        :param done_callback:  function to call when scope is done with measurements
+        """
+
+        assert self.state == self.STATE_INIT
+        self.state = self.STATE_SAMPLER
+
+        Process(target=lambda *_: (sleep(2), sampling_callback())).start()
+
+        def trg(*_):
+            sleep(4)
+            self._state = self.STATE_INIT
+            print('set device back to init')
+            done_callback()
+            print('DONE')
+
+        Process(target=trg).start()
+
+        return
 
 
 if __name__ == '__main__':

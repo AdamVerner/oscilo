@@ -40,14 +40,23 @@ class Settings(Gtk.Grid):
         self.size = (800, 400)
 
         self.trigger    = Trigger(self.device)
-        self.vertical   = Vertical()
-        self.horizontal = Horizontal()
+        self.vertical   = Vertical(self.device)
+        self.horizontal = Horizontal(self.device)
         self.filtering  = Filters()
+        self.control    = Control(self.device)
+
+        # TODO add dividers
+        self.set_border_width(10)
+        self.set_column_spacing(20)
+
+        self.set_row_homogeneous(True)
+        self.set_column_homogeneous(True)
 
         self.attach(self.trigger,    0, 0, 1, 1)
         self.attach(self.vertical,   1, 0, 1, 1)
         self.attach(self.horizontal, 2, 0, 1, 1)
         self.attach(self.filtering,  3, 0, 1, 1)
+        self.attach(self.control,    4, 0, 1, 1)
 
 
 class Trigger(Gtk.Grid):
@@ -74,14 +83,15 @@ class Trigger(Gtk.Grid):
         self.device = device
         label = Gtk.Label(LABEL_START + 'TRIGGER MENU' + LABEL_END, **LABEL_PROPS)
 
-        level_adjust = Gtk.Adjustment(self.device.trigger_level, 0, 255, 1, 100, 10)
+        level_adjust = Gtk.Adjustment(self.device.trig_lvl, self.device.trig_min,
+                                      self.device.trig_max, 1, 1, 1)
         level_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, level_adjust)
         level_scale.set_size_request(-1, 100)
         level_scale.set_inverted(True)
         level_scale.set_round_digits(0)
 
         def set_trigger_level(btn):
-            self.device.trigger_level = level_scale.get_value()
+            self.device.trig_lvl = level_scale.get_value()
             pass
 
         level_set = Gtk.Button('SET')
@@ -131,7 +141,6 @@ class Trigger(Gtk.Grid):
         self.attach(level_set, 1, 4, 1, 1)
 
 
-
 class Vertical(Gtk.Grid):
     """
     AC/DC
@@ -139,22 +148,107 @@ class Vertical(Gtk.Grid):
     volts/div
     """
 
-    def __init__(self):
+    def __init__(self, device):
         super(Vertical, self).__init__()
+        self.device = device
         label = Gtk.Label(LABEL_START + 'VERTICAL MENU' + LABEL_END, **LABEL_PROPS)
-        self.attach(label, 0, 0, 1, 1)
+
+        vga_label = Gtk.Label('VGA')
+        att_label = Gtk.Label('ATT')
+
+        def vga_callback(_):
+            self.device.vga_level = vga_scale.get_value()
+            self.device.trig_lvl(122)
+
+        def att_callback(_):
+            """snap to concrete value specified in device.att_steps"""
+            # https://stackoverflow.com/questions/12141150/
+            # from list of ints, get number closest to given value
+            value = min(self.device.att_steps, key=lambda x: abs(x - att_scale.get_value()))
+            att_scale.set_value(value)
+            self.device.att_level = value
+
+            pass
+
+        vga_set = Gtk.Button('SET')
+        att_set = Gtk.Button('SET')
+
+        vga_set.connect('pressed', vga_callback)
+        att_set.connect('pressed', att_callback)
+
+        vga_adj = Gtk.Adjustment(self.device.vga_level, self.device.vga_min, self.device.vga_max,
+                                 1, 1,)
+        vga_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, vga_adj)
+        vga_scale.set_size_request(-1, 100)
+        vga_scale.set_inverted(True)
+        vga_scale.set_round_digits(0)
+
+        att_adj = Gtk.Adjustment(self.device.att_level,
+                                 min(self.device.att_steps),
+                                 max(self.device.att_steps),
+                                 1, 1)
+        att_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, att_adj)
+        att_scale.set_size_request(-1, 100)
+        att_scale.set_inverted(True)
+        att_scale.set_round_digits(0)
+
+        for step in self.device.att_steps:
+            att_scale.add_mark(step, Gtk.PositionType.RIGHT)
+
+        self.attach(label, 0, 0, 2, 1)
+        self.attach(vga_label, 0, 1, 1, 1)
+        self.attach(att_label, 1, 1, 1, 1)
+        self.attach(vga_scale, 0, 2, 1, 1)
+        self.attach(att_scale, 1, 2, 1, 1)
+
+        self.attach(vga_set, 0, 3, 1, 1)
+        self.attach(att_set, 1, 3, 1, 1)
 
 
 class Horizontal(Gtk.Grid):
     """
     position
     sec/div
+    |------------------|
+    | |--------------| |
+    | |  SPIN BUTTON | |
+    | |--------------| |
+    | |--------------| |
+    | |    ROUGH     | |
+    | |--------------| |
+    | |--------------| |
+    | |     SET      | |
+    | |--------------| |
+    |------------------|
     """
 
-    def __init__(self):
+    def __init__(self, device):
         super(Horizontal, self).__init__()
+        self.device = device
         label = Gtk.Label(LABEL_START + 'HORIZONTAL MENU' + LABEL_END, **LABEL_PROPS)
+
+        el = Gtk.Label()
+
+        sps_adjust = Gtk.Adjustment(100, 0, 255, 1, 1, 1)
+        sps_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, sps_adjust)
+        sps_scale.set_size_request(-1, -1)
+        sps_scale.set_inverted(True)
+        sps_scale.set_round_digits(0)
+
+        sps_spin = Gtk.SpinButton()
+
+        def set_sps(_):
+            self.device.trig_lvl = sps_scale.get_value()
+            pass
+
+        sps_set = Gtk.Button('SET')
+        sps_set.connect('pressed', set_sps)
+
         self.attach(label, 0, 0, 1, 1)
+        self.attach(el, 0, 1, 1, 1)
+        self.attach(sps_spin, 0, 2, 1, 1)
+        self.attach(sps_scale, 0, 3, 1, 1)
+        self.attach(sps_set, 0, 4, 1, 1)
 
 
 class Filters(Gtk.Grid):
@@ -167,7 +261,48 @@ class Filters(Gtk.Grid):
     def __init__(self):
         super(Filters, self).__init__()
         label = Gtk.Label(LABEL_START + 'FILTERS' + LABEL_END, **LABEL_PROPS)
+
+        not_implemented_label = Gtk.Label('Not implemented yet...')
+
         self.attach(label, 0, 0, 1, 1)
+        self.attach(not_implemented_label, 0, 1, 1, 1)
+
+
+class Control(Gtk.Grid):
+    """
+    only for get_samples button for now
+    """
+
+    def __init__(self, device):
+        super(Control, self).__init__()
+        self.device = device
+        label = Gtk.Label(LABEL_START + 'CONTROL' + LABEL_END, **LABEL_PROPS)
+
+        self.ctrl_btn  = Gtk.Button('RDY')
+        self.auto_pull = Gtk.CheckButton()
+        auto_pull_lbl = Gtk.Label('Auto pull')
+
+        self.ctrl_btn.connect('pressed', self.ctrl_begin_callback)
+
+        self.attach(label, 0, 0, 2, 1)
+        self.attach(self.ctrl_btn, 0, 1, 2, 1)
+        self.attach(auto_pull_lbl, 0, 2, 1, 1)
+        self.attach(self.auto_pull, 1, 2, 1, 1)
+
+    def sampling_cb(self, *_):
+        print('trigger received')
+        Glib.idle_add(lambda: self.ctrl_btn.set_label('TRIGR\'D'))
+
+    def done_cb(self, *_):
+        Glib.idle_add(lambda: self.ctrl_btn.set_label('READY'))
+        # change button label
+        # plot values if the option is enabled
+        if self.auto_pull.get_active():
+            print('auto_pull is active')
+
+    def ctrl_begin_callback(self, *_):
+        Glib.idle_add(lambda: self.ctrl_btn.set_label('ACTIVE'))
+        self.device.activate_scope(self.sampling_cb, self.done_cb)
 
 
 if __name__ == '__main__':
