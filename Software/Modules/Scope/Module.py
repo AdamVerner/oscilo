@@ -35,6 +35,8 @@ class Module(Gtk.Grid):
         self.settings = Settings(self.device)
         self.signals = Signals()
 
+        self.settings.control.push_func = self.plot.update
+
         self.attach(self.plot, 0, 0, 1, 1)
         self.attach(self.settings, 0, 1, 1, 1)
         self.attach(self.signals, 1, 0, 1, 2)

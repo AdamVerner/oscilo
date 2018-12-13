@@ -18,7 +18,8 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
+from multiprocessing import Pipe
 from Popups import task_fail
 
 
@@ -273,35 +274,57 @@ class Control(Gtk.Grid):
     only for get_samples button for now
     """
 
+    push_func = None  # function to call when automatic sample collection is wanted
+
     def __init__(self, device):
         super(Control, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'CONTROL' + LABEL_END, **LABEL_PROPS)
 
-        self.ctrl_btn  = Gtk.Button('RDY')
+        ctrl_btn  = Gtk.Button('READY')
         self.auto_pull = Gtk.CheckButton()
         auto_pull_lbl = Gtk.Label('Auto pull')
 
-        self.ctrl_btn.connect('pressed', self.ctrl_begin_callback)
+        ctrl_btn.connect('pressed', self.ctrl_begin_callback)
 
         self.attach(label, 0, 0, 2, 1)
-        self.attach(self.ctrl_btn, 0, 1, 2, 1)
+        self.attach(ctrl_btn, 0, 1, 2, 1)
         self.attach(auto_pull_lbl, 0, 2, 1, 1)
         self.attach(self.auto_pull, 1, 2, 1, 1)
 
+        # Glib workaround begin
+        # https://stackoverflow.com/questions/13518452/
+        parent_conn, self.child_conn = Pipe(duplex=False)  # Pipe to pump the label data through
+
+        def read_data(source, condition):
+            """
+            watches pipe and when data changes, changes the label
+            """
+            assert parent_conn.poll()
+            i = parent_conn.recv()
+            for child in ctrl_btn.get_children():
+                child.set_label(i)
+                child.set_use_markup(True)
+            return True  # continue reading
+
+        GObject.io_add_watch(parent_conn.fileno(), GObject.IO_IN, read_data)
+
+        # Glib workaround end
+
     def sampling_cb(self, *_):
         print('trigger received')
-        Glib.idle_add(lambda: self.ctrl_btn.set_label('TRIGR\'D'))
+        self.child_conn.send("<span color='#999910'>TRIGR'D</span>")
 
     def done_cb(self, *_):
-        Glib.idle_add(lambda: self.ctrl_btn.set_label('READY'))
+        self.child_conn.send("<span color='green'>READY</span>")
         # change button label
         # plot values if the option is enabled
-        if self.auto_pull.get_active():
-            print('auto_pull is active')
+        if self.auto_pull.get_active() and self.push_func:
+            print('pushing samples to graph')
+            self.push_func(self.device.get_samples())
 
     def ctrl_begin_callback(self, *_):
-        Glib.idle_add(lambda: self.ctrl_btn.set_label('ACTIVE'))
+        self.child_conn.send("<span color='#999910'>ACTIVE</span>")
         self.device.activate_scope(self.sampling_cb, self.done_cb)
 
 
