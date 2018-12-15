@@ -1,0 +1,4 @@
+venv/
+*.py[coi]
+
+__pycache__/
