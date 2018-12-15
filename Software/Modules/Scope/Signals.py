@@ -23,7 +23,7 @@ from gi.repository import Gtk
 class Signals(Gtk.Grid):
     """
     selects signal that will be highlighted
-    posibilitiy to add more signals
+    possibility to add more signals
         - reference signals from CSV files
         - Math with other signals
 

@@ -47,7 +47,7 @@ class Device(object):
         self.log_data = list()  # each line is one information of device log
         self.state = self.STATE_INIT
 
-    def get_samples(self, samples):
+    def get_samples(self, samples=1024):
         self.state = self.STATE_SAMPLE_MEM_READER
 
         x = np.arange(samples)  # the points on the x axis for plotting
@@ -113,14 +113,10 @@ class Device(object):
         :param done_callback:  function to call when scope is done with measurements
         """
 
-        assert self.state == self.STATE_INIT
-        self.state = self.STATE_SAMPLER
-
         Process(target=lambda *_: (sleep(2), sampling_callback())).start()
 
         def trg(*_):
             sleep(4)
-            self._state = self.STATE_INIT
             print('set device back to init')
             done_callback()
             print('DONE')
