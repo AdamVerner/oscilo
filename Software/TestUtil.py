@@ -10,6 +10,8 @@ def test_util(subject, *functions):
     """
 
     w = Gtk.Window()
+    w.size = (1200, 1000)
+
     g = Gtk.Grid()
     w.add(g)
 
@@ -23,6 +25,8 @@ def test_util(subject, *functions):
 
     # attach every button to grid
     [g.attach(btn, idx, 1, 1, 1) for idx, btn in enumerate(btns)]
+
+    w.connect('delete-event', Gtk.main_quit)
 
     w.show_all()
     Gtk.main()

@@ -3,7 +3,7 @@
 """
 
   |----------------------------------------------------------------------------|
-  |  TRIGGER  SETTING    #    Horizontal     #    VERTICAL    #    FILTERING   |
+  |   TRIGGER_SETTING    #    Horizontal     #    VERTICAL    #    FILTERING   |
   | |------| |-------|   #   |----------|    #   |--------|   #   |---------|  |
   | | Rise | |  Tval |   #   |  SPEED   |    #   |  todo  |   #   |         |  |
   | |------| |-------|   #   |----------|    #   |   T    |   #   |         |  |

@@ -19,6 +19,7 @@
 """
 
 
+from typing import Union
 from matplotlib.figure import Figure
 try:
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
@@ -35,16 +36,17 @@ from gi.repository import Gtk, GObject
 from multiprocessing import Pipe
 
 
-class Plot(Gtk.Box):
+class Plot(Gtk.Alignment):
 
     graph_properties = {
         'linestyle': '-',
         'marker': '',
     }
 
-    def __init__(self, size=(800, 400)):
-        self.size = size
+    def __init__(self):
         Gtk.Box.__init__(self)
+        self.set_hexpand(True)
+        self.set_vexpand(True)
 
         fig = Figure()
 
@@ -53,7 +55,7 @@ class Plot(Gtk.Box):
         self.ax.grid(True, 'both', 'both')
 
         canvas = FigureCanvas(fig)
-        canvas.set_size_request(*size)
+        canvas.set_size_request(600, 600)
         self.add(canvas)
 
         parent_conn, self.child_conn = Pipe(duplex=False)  # Pipe to pump the label data through
@@ -64,7 +66,6 @@ class Plot(Gtk.Box):
             """
             assert parent_conn.poll()
             i = parent_conn.recv()
-            print('recived', i)
             self.ax.clear()
             self.ax.grid(True, 'both', 'both')
             print(self.ax.plot(i, **self.graph_properties))
@@ -76,7 +77,7 @@ class Plot(Gtk.Box):
     # TODO z plotu odebrat popisky (asi)
 
     def update(self, values):
-        # type: (tuple) -> None
+        # type: (Union[tuple, list]) -> None
         """
         renews plotted values
         when all values are
@@ -98,6 +99,6 @@ if __name__ == '__main__':
         print('t2')
         x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         y = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
-        p.update((x, y))
+        p.update(x)
 
     test_util(p, t1, t2)

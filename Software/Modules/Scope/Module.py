@@ -28,8 +28,7 @@ class Module(Gtk.Grid):
 
     def __init__(self, device):
         self.device = device
-
-        Gtk.Grid.__init__(self)
+        super(Module, self).__init__()
 
         self.plot = Plot()
         self.settings = Settings(self.device)
