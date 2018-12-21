@@ -154,12 +154,12 @@ class Vertical(Gtk.Grid):
         self.device = device
         label = Gtk.Label(LABEL_START + 'VERTICAL MENU' + LABEL_END, **LABEL_PROPS)
 
-        vga_label = Gtk.Label('VGA')
+        vga_label = Gtk.Label('GAIN')
         att_label = Gtk.Label('ATT')
+        off_label = Gtk.Label('OFFSET')
 
         def vga_callback(_):
             self.device.vga_level = vga_scale.get_value()
-            self.device.trig_lvl(122)
 
         def att_callback(_):
             """snap to concrete value specified in device.att_steps"""
@@ -169,13 +169,16 @@ class Vertical(Gtk.Grid):
             att_scale.set_value(value)
             self.device.att_level = value
 
-            pass
+        def off_callback(_):
+            self.device.offset = off_scale.get_value()
 
         vga_set = Gtk.Button('SET')
         att_set = Gtk.Button('SET')
+        off_set = Gtk.Button('SET')
 
         vga_set.connect('pressed', vga_callback)
         att_set.connect('pressed', att_callback)
+        off_set.connect('pressed', off_callback)
 
         vga_adj = Gtk.Adjustment(self.device.vga_level, self.device.vga_min, self.device.vga_max,
                                  1, 1,)
@@ -195,15 +198,29 @@ class Vertical(Gtk.Grid):
 
         for step in self.device.att_steps:
             att_scale.add_mark(step, Gtk.PositionType.RIGHT)
+        
+        off_adj = Gtk.Adjustment(self.device.offset, 0, 25, 1, 1)
 
-        self.attach(label, 0, 0, 2, 1)
+        off_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, off_adj)
+        off_scale.set_size_request(-1, 100)
+        att_scale.set_inverted(True)
+        att_scale.set_round_digits(0)
+
+
+        self.attach(label, 0, 0, 3, 1)
+
         self.attach(vga_label, 0, 1, 1, 1)
         self.attach(att_label, 1, 1, 1, 1)
+        self.attach(off_label, 2, 1, 1, 1)
+
         self.attach(vga_scale, 0, 2, 1, 1)
         self.attach(att_scale, 1, 2, 1, 1)
+        self.attach(off_scale, 2, 2, 1, 1)
+
 
         self.attach(vga_set, 0, 3, 1, 1)
         self.attach(att_set, 1, 3, 1, 1)
+        self.attach(off_set, 2, 3, 1, 1)
 
 
 class Horizontal(Gtk.Grid):

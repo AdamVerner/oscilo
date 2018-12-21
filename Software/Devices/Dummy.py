@@ -41,7 +41,12 @@ class Device(object):
     # attenuator settings
     att_level = 0  # TODO add setter and getter functions
     # att usually doesn't have that level-variability as vga, so store the values in list
+
     att_steps = [1, 4, 10, 20]
+
+    offset = 0
+
+
 
     def __init__(self):
         self.log_data = list()  # each line is one information of device log

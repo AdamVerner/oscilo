@@ -37,9 +37,6 @@ class MainWindow(Gtk.Window):
 
         self.add(ModuleSelector(self.device))
 
-        self.mainGrid = Gtk.Grid()
-        self.add(self.mainGrid)
-
         self.show_all()
 
 
