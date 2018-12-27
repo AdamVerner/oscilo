@@ -19,31 +19,20 @@ module state_watcher(
 	input [7:0]	Rx_data;
 	input 		reset;
 	
-	output reg[7:0]	state;
-	output reg	state_change;
+	output wire[7:0]	state;
+	output 	state_change;
 
-	task tskReset;
-	begin
-		state <= module_id;  /* this module should be DEFAULT ON */
-		state_change <= 1'b0;
-	end
-	endtask
+	reg [7:0] state_temp;
+	reg 	  state_change_temp;
 
-	initial tskReset();
-	always @(posedge reset) tskReset();
+	assign state_change = state_change_temp;
+	assign state = state_temp;
 
-	/* TODO is reset posedge or negedge? */
-	always @(posedge Rx_ready)
-	begin
-		if((state == module_id))
-		begin
-			state <= Rx_data;
-			state_change <= 1;
-		end
-	end
+
+
 
 	always @(negedge Rx_ready)
-		state_change <= 0;
+		state_change_temp <= 0;
 	
 
 endmodule

@@ -23,7 +23,7 @@ module sampler #(
     output              m_clk,
     output              m_addr,
     output              m_we, /* write-enable */
-    output              m_cs /* chip-select */
+    output              m_cs, /* chip-select */
 
     output              m_offset /*  */
     );
@@ -32,7 +32,7 @@ module sampler #(
     reg [SAMPLE_DEPTH<<2:0]   post_samples;  /* 50% trigger placement */
     reg [SAMPLE_DEPTH<<1:0]   offset;
 
-    reg                       active
+    reg                       active;
     reg                       trig;
 
     /****** module state watcher ******/
@@ -68,7 +68,7 @@ module sampler #(
                 m_cs    <= 1;
                 m_addr <= 1;
                 post_samples <= 0;
-                sample_state <= PRE_TRIG
+                sample_state <= PRE_TRIG;
             end
             /* store samples in memmory and add 1 to address and let it
             * overflow indefinitley (redneck circular-buffer) */
@@ -77,8 +77,8 @@ module sampler #(
                 m_addr      <= m_addr+ 1;
                 if(trig)
                 begin
-                    sampler_state <= POST_TRIG
-                    m_offset <= m_addr;;
+                    sampler_state <= POST_TRIG;
+                    m_offset <= m_addr;
                 end
             end
             /* continue to store samples, but also watch for the number of

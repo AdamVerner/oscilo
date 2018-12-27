@@ -18,13 +18,13 @@
 # -------------------------------------------------------------------------- #
 #
 # Quartus II 64-Bit
-# Version 14.1.0 Build 186 12/03/2014 SJ Full Version
-# Date created = 10:11:36  listopadu 17, 2018
+# Version 14.1.0 Build 186 12/03/2014 SJ Web Edition
+# Date created = 19:44:49  December 27, 2018
 #
 # -------------------------------------------------------------------------- #
 
 QUARTUS_VERSION = "14.1"
-DATE = "10:11:36  listopadu 17, 2018"
+DATE = "19:44:49  December 27, 2018"
 
 # Revisions
 

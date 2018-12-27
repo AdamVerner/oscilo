@@ -26,13 +26,13 @@ module seven_segment(
     always @(posedge clk)
     begin
    
-        assign segA = SevenSeg[6];
-        assign segB = SevenSeg[5];
-        assign segC = SevenSeg[4];
-        assign segD = SevenSeg[3];
-        assign segE = SevenSeg[2];
-        assign segF = SevenSeg[1];
-        assign segG = SevenSeg[0];
+        segA <= SevenSeg[6];
+        segB <= SevenSeg[5];
+        segC <= SevenSeg[4];
+        segD <= SevenSeg[3];
+        segE <= SevenSeg[2];
+        segF <= SevenSeg[1];
+        segG <= SevenSeg[0];
 
         case(faze)
             8'h0: begin
