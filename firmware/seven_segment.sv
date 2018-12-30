@@ -1,75 +1,146 @@
 /*
-* clk signal is something between 100Hz and "few kilos"
-* doesn't support the dots between numbers
-*/
+ * bcd1-4 are indexed from right(1 is LSB in dec)
+ * ".bcd1(4'h1), .bcd2(4'h2), .bcd3(4'h3), .bcd4(4'h4)" will result into 4321 on display
+ * can print anything from zero to F
+ *
+ */
 
 module seven_segment(
-    clk, bcd,
-    segA, segB, segC, segD, segE, segF, segG,
-    dsen
+    input clk_50mhz, reset,
+
+    input [3:0] bcd1,
+    input [3:0] bcd2,
+    input [3:0] bcd3,
+    input [3:0] bcd4,
+
+    output segA, segB, segC, segD, segE, segF, segG,
+    output dsen1, dsen2, dsen3, dsen4
     );
 
-    input           clk;
-    input reg[3:0]  bcd[3:0];
 
-    output          segA, segB, segC, segD, segE, segF, segG;
-    output reg[3:0] dsen;
+    wire clk_500hz;
+    reg [15:0] dsp_cnt;  // TODO optimalize
+    reg [3:0] dsp_en;
+    reg [6:0] dp_enc [3:0];
 
-    reg [3:0] faze;
-    reg [7:0] SevenSeg;
-
-    initial begin
-        faze = 1;
-    end
+    assign {dsen1, dsen2, dsen3, dsen4} = dsp_en;
 
 
-    always @(posedge clk)
+    // encode input bcd
+    always @*
     begin
-   
-        segA <= SevenSeg[6];
-        segB <= SevenSeg[5];
-        segC <= SevenSeg[4];
-        segD <= SevenSeg[3];
-        segE <= SevenSeg[2];
-        segF <= SevenSeg[1];
-        segG <= SevenSeg[0];
-
-        case(faze)
-            8'h0: begin
-                faze <= 1;
-                dsen <= 4'b0001;
-            end 8'h1: begin
-                faze <= 2;
-                dsen <= 4'b0010;
-            end 8'h2: begin
-                faze <= 3;
-                dsen <= 4'b0100;
-            end 8'h3: begin
-                faze <= 0;
-                dsen <= 4'b1000;
-            end default: faze <= 0;
+        case(bcd1)
+            4'h0: dp_enc[0] = 7'b1111110;
+            4'h1: dp_enc[0] = 7'b0110000;
+            4'h2: dp_enc[0] = 7'b1101101;
+            4'h3: dp_enc[0] = 7'b1111001;
+            4'h4: dp_enc[0] = 7'b0110011;
+            4'h5: dp_enc[0] = 7'b1011011;
+            4'h6: dp_enc[0] = 7'b1011111;
+            4'h7: dp_enc[0] = 7'b1110000;
+            4'h8: dp_enc[0] = 7'b1111111;
+            4'h9: dp_enc[0] = 7'b1111011;
+            4'ha: dp_enc[0] = 7'b1110111;
+            4'hb: dp_enc[0] = 7'b0011111;
+            4'hc: dp_enc[0] = 7'b1001110;
+            4'hd: dp_enc[0] = 7'b0111101;
+            4'he: dp_enc[0] = 7'b1001111;
+            4'hf: dp_enc[0] = 7'b1000111;
         endcase
-        case(bcd[faze])
-            4'h0: SevenSeg = 8'b11111100;
-            4'h1: SevenSeg = 8'b01100000;
-            4'h2: SevenSeg = 8'b11011010;
-            4'h3: SevenSeg = 8'b11110010;
-            4'h4: SevenSeg = 8'b01100110;
-            4'h5: SevenSeg = 8'b10110110;
-            4'h6: SevenSeg = 8'b10111110;
-            4'h7: SevenSeg = 8'b11100000;
-            4'h8: SevenSeg = 8'b11111110;
-            4'h9: SevenSeg = 8'b11110110;
-            4'ha: SevenSeg = 8'b01110111;
-            4'hb: SevenSeg = 8'b01111100;
-            4'hc: SevenSeg = 8'b00111001;
-            4'hd: SevenSeg = 8'b01011110;
-            4'he: SevenSeg = 8'b01111001;
-            4'hf: SevenSeg = 8'b01110001;
-            default: SevenSeg = 8'b00000000;
+        case(bcd2)
+            4'h0: dp_enc[1] = 7'b1111110;
+            4'h1: dp_enc[1] = 7'b0110000;
+            4'h2: dp_enc[1] = 7'b1101101;
+            4'h3: dp_enc[1] = 7'b1111001;
+            4'h4: dp_enc[1] = 7'b0110011;
+            4'h5: dp_enc[1] = 7'b1011011;
+            4'h6: dp_enc[1] = 7'b1011111;
+            4'h7: dp_enc[1] = 7'b1110000;
+            4'h8: dp_enc[1] = 7'b1111111;
+            4'h9: dp_enc[1] = 7'b1111011;
+            4'ha: dp_enc[1] = 7'b1110111;
+            4'hb: dp_enc[1] = 7'b0011111;
+            4'hc: dp_enc[1] = 7'b1001110;
+            4'hd: dp_enc[1] = 7'b0111101;
+            4'he: dp_enc[1] = 7'b1001111;
+            4'hf: dp_enc[1] = 7'b1000111;
         endcase
-
+        case(bcd3)
+            4'h0: dp_enc[2] = 7'b1111110;
+            4'h1: dp_enc[2] = 7'b0110000;
+            4'h2: dp_enc[2] = 7'b1101101;
+            4'h3: dp_enc[2] = 7'b1111001;
+            4'h4: dp_enc[2] = 7'b0110011;
+            4'h5: dp_enc[2] = 7'b1011011;
+            4'h6: dp_enc[2] = 7'b1011111;
+            4'h7: dp_enc[2] = 7'b1110000;
+            4'h8: dp_enc[2] = 7'b1111111;
+            4'h9: dp_enc[2] = 7'b1111011;
+            4'ha: dp_enc[2] = 7'b1110111;
+            4'hb: dp_enc[2] = 7'b0011111;
+            4'hc: dp_enc[2] = 7'b1001110;
+            4'hd: dp_enc[2] = 7'b0111101;
+            4'he: dp_enc[2] = 7'b1001111;
+            4'hf: dp_enc[2] = 7'b1000111;
+        endcase
+        case(bcd4)
+            4'h0: dp_enc[3] = 7'b1111110;
+            4'h1: dp_enc[3] = 7'b0110000;
+            4'h2: dp_enc[3] = 7'b1101101;
+            4'h3: dp_enc[3] = 7'b1111001;
+            4'h4: dp_enc[3] = 7'b0110011;
+            4'h5: dp_enc[3] = 7'b1011011;
+            4'h6: dp_enc[3] = 7'b1011111;
+            4'h7: dp_enc[3] = 7'b1110000;
+            4'h8: dp_enc[3] = 7'b1111111;
+            4'h9: dp_enc[3] = 7'b1111011;
+            4'ha: dp_enc[3] = 7'b1110111;
+            4'hb: dp_enc[3] = 7'b0011111;
+            4'hc: dp_enc[3] = 7'b1001110;
+            4'hd: dp_enc[3] = 7'b0111101;
+            4'he: dp_enc[3] = 7'b1001111;
+            4'hf: dp_enc[3] = 7'b1000111;
+        endcase
     end
 
 
-endmodule
+    // generate slow clock
+    always @(posedge clk_50mhz)
+    begin
+        dsp_cnt <= dsp_cnt + 1;
+        if(dsp_cnt == 50000)
+        begin
+            dsp_cnt <= 0;
+            clk_500hz <= ~clk_500hz;
+        end
+    end
+
+
+    // write to display
+    always @(posedge clk_500hz)
+        case(dsp_en)
+            4'b1110: // rightmost
+            begin
+                dsp_en = 4'b1101;
+                {segA, segB, segC, segD, segE, segF, segG} = dp_enc[1];
+            end
+            4'b1101:
+            begin
+                dsp_en = 4'b1011;
+                {segA, segB, segC, segD, segE, segF, segG} = dp_enc[2];
+            end
+            4'b1011:
+            begin
+                dsp_en = 4'b0111;
+                {segA, segB, segC, segD, segE, segF, segG} = dp_enc[3];
+            end
+            4'b0111: //leftmost
+            begin
+                dsp_en = 4'b1110;
+                {segA, segB, segC, segD, segE, segF, segG} = dp_enc[0];
+            end
+            default:
+                dsp_en = 4'b1110;
+        endcase
+
+    endmodule
