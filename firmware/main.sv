@@ -47,6 +47,7 @@ module main(
 	
 	
 	// sample_reader_instance start
+	wire sample_reader_activate, sample_reader_done;
 	
 	
 	// sample_reader_instance stop

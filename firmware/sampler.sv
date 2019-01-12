@@ -47,9 +47,9 @@ module sampler(
 
     // TRIGGER LOGIC BEGIN
     reg thr1, thr2;
-    always @(posedge clk_adc)
+    always @(posedge adc_clk)
     begin
-        thr1 <= (data_in >= 8'h80);
+        thr1 <= (adc_data >= 8'h80);
         thr2 <= thr1;
     end
     assign trig = thr1 & ~thr2; /* assert true for one clock*/
