@@ -98,6 +98,7 @@ set_location_assignment PIN_115 -to debug[3]
 set_location_assignment PIN_111 -to debug[2]
 set_location_assignment PIN_104 -to debug[1]
 set_location_assignment PIN_105 -to debug[0]
+set_global_assignment -name SYSTEMVERILOG_FILE uart_tx.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ram_sw_ar.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sampler.sv
 set_global_assignment -name SYSTEMVERILOG_FILE uart_rx.sv

@@ -2,7 +2,9 @@ module main(
 
 	input CLK, // MAIN 50 MHZ clock
 	
-	input RXD, TXD,   // UART
+	input RXD,   // UART
+	output TXD,
+	
 	input KEY4,  // RESET
 	
 	output [7:0] debug,  // test only
@@ -31,6 +33,7 @@ module main(
 								 .dsen1(DSEN_1), .dsen2(DSEN_2), .dsen3(DSEN_3), .dsen4(DSEN_4)
 								);
 
+	
 	// sampling memmory start
 	wire sm_we, sm_oe, sm_clk;
 	wire [7:0] sm_data_in;
@@ -57,7 +60,7 @@ module main(
 
 	// replayer_instance start
 	wire replayer_activate, replayer_done;
-	assign tx_data = rx_ready;
+	assign tx_data = rx_data;
 	assign tx_start = rx_ready;
 	// replayer_instance stop
 
@@ -102,6 +105,7 @@ module main(
 					test_activate = 0;
 					sampler_activate = 0;
 					sample_reader_activate = 0;
+					state = ST_INIT; //move back to init on invlaid state
 				end
 			endcase
 		end

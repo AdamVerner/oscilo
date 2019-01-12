@@ -38,7 +38,7 @@ module uart_tx
       case (r_SM_Main)
         st_IDLE:
           begin
-            tx <= 1'b1;         // Drive Line High for Idle
+            txd <= 1'b1;         // Drive Line High for Idle
             r_Tx_Done     <= 1'b0;
             r_Clock_Count <= 0;
             r_Bit_Index   <= 0;
@@ -57,7 +57,7 @@ module uart_tx
         // Send out Start Bit. Start bit = 0
         st_TX_START_BIT:
           begin
-            tx <= 1'b0;
+            txd <= 1'b0;
              
             // Wait CLKS_PER_BIT-1 clock cycles for start bit to finish
             if (r_Clock_Count < CLKS_PER_BIT-1)
@@ -76,7 +76,7 @@ module uart_tx
         // Wait CLKS_PER_BIT-1 clock cycles for data bits to finish         
         st_TX_DATA_BITS:
           begin
-            tx <= r_Tx_Data[r_Bit_Index];
+            txd <= r_Tx_Data[r_Bit_Index];
              
             if (r_Clock_Count < CLKS_PER_BIT-1)
               begin
@@ -105,7 +105,7 @@ module uart_tx
         // Send out Stop bit.  Stop bit = 1
         st_TX_STOP_BIT:
           begin
-            tx <= 1'b1;
+            txd <= 1'b1;
              
             // Wait CLKS_PER_BIT-1 clock cycles for Stop bit to finish
             if (r_Clock_Count < CLKS_PER_BIT-1)
