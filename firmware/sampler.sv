@@ -6,27 +6,21 @@
 *   TODO more advanced trigger logic (external module)
 */ 
 
-module sampler #(
-    parameter module_id = 8'h10,
-    parameter SAMPLE_DEPTH = 1024)(
-
-    /* general signals */
-    input   wire        clk,
-    input   wire        state,
-    input   wire [7:0]  state_change,
-
-    /* ADC */
-    input wire [7:0]    data_in,
-    output wire         clk_adc,
-
-    /* MEMMORY */
-    output              m_clk,
-    output              m_addr,
-    output              m_we, /* write-enable */
-    output              m_cs, /* chip-select */
-
-    output              m_offset /*  */
-    );
+module sampler(
+	
+	input        clk_50mhz, reset,
+	
+	input        activate, // drive to 1 to activate the module
+	output       done,    // signals that the module has done what it needed to do
+	
+	output       adc_clk,
+	input  [7:0] adc_data
+	
+	output [7:0] mem_data,
+	output [7:0] mem_addr,
+	output 		 mem_we
+	);
+	
 
 
     reg [SAMPLE_DEPTH<<2:0]   post_samples;  /* 50% trigger placement */

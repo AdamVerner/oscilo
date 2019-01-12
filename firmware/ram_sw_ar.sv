@@ -17,11 +17,11 @@ input   wire                  we,       // Write Enable
 input   wire                  oe        // Output Enable
 );
 
-/***** INTERNAL VARIABLES *****/
 
 /* associatvie array to save mem footprint*/
 typedef reg [ADDR_WIDTH-1:0] mem_addr;
 reg [DATA_WIDTH-1:0] mem [mem_addr];
+
 
 /* Synchronous memmory write */
 always @ (posedge clk)
