@@ -2,7 +2,7 @@ module main(
 
 	input CLK, // MAIN 50 MHZ clock
 	
-	input RXD,   // UART_IN
+	input RXD, TXD,   // UART
 	input KEY4,  // RESET
 	
 	output [7:0] debug,  // test only
@@ -12,13 +12,17 @@ module main(
 	);
 	
 	wire [7:0]	rx_data;
-	wire 			rx_ready;
+	wire		rx_ready;
+
+	wire [7:0]	tx_data;
+	wire		tx_start, tx_active, tx_done;
 	
-	reg [7:0] 	state;
-	wire			state_change;
+	reg [7:0]	state;
+	wire		state_change;
 	
-		
-	uart_rx reciever(.clk(CLK), .rxd(RXD), .rx_rd(rx_ready), .rx_data(rx_data));
+
+	uart_rx reciever  (.clk(CLK), .rxd(RXD), .rx_rd(rx_ready), .rx_data(rx_data));
+	uart_tx transmiter(.clk(CLK), .txd(TXD), .start(tx_start), .data_in(tx_data), .active(tx_active), .done(tx_done));
 
 	seven_segment segmentdisplay(.clk_50mhz(CLK), .reset(KEY4),
 								 .bcd1(4'h0), .bcd2(4'h0), .bcd3(state[3:0]), .bcd4(state[7:4]),
@@ -48,11 +52,15 @@ module main(
 	
 	// sample_reader_instance start
 	wire sample_reader_activate, sample_reader_done;
-	
-	
+
 	// sample_reader_instance stop
-	
-	
+
+	// replayer_instance start
+	wire replayer_activate, replayer_done;
+	assign tx_data = rx_ready;
+	assign tx_start = rx_ready;
+	// replayer_instance stop
+
 	
 	// test instance start
 	wire test_activate, test_done;
