@@ -11,96 +11,107 @@ module sampler(
 	input        clk_50mhz, reset,
 	
 	input        activate, // drive to 1 to activate the module
-	output       done,    // signals that the module has done what it needed to do
+	output       done = 0,    // signals that the module has done what it needed to do
 	
 	output       adc_clk,
-	input  [7:0] adc_data
-	
+	input  [7:0] adc_data,
+
+    output       mem_clk,
 	output [7:0] mem_data,
 	output [7:0] mem_addr,
 	output 		 mem_we
 	);
-	
+
+    parameter SAMPLE_DEPTH = 8; // 256 samples
+
+    wire [SAMPLE_DEPTH-1:0] samples_trigger_offset;
+    wire [SAMPLE_DEPTH-1:0] remaining_samples;
+    wire                    activate_adc_clk;
+    wire                    activate_mem_clk;
+    wire                    trig;
+
+    wire [3:0]               sampler_state;
+
+    parameter ST_IDLE      = 0;
+    parameter ST_SETUP     = 1;
+    parameter ST_PRE_TRIG  = 2;
+    parameter ST_POST_TRIG = 3;
+    parameter ST_SHIFT     = 4;
+    parameter ST_CLEAR     = 5;
 
 
-    reg [SAMPLE_DEPTH<<2:0]   post_samples;  /* 50% trigger placement */
-    reg [SAMPLE_DEPTH<<1:0]   offset;
-
-    reg                       active;
-    reg                       trig;
-
-    /****** module state watcher ******/
-    always @(posedge state_change)
-    begin
-        if(state == module_id)
-            active <= 1;
-        else
-            active <= 1;
-
-    end
-
-    typedef enum logic[2:0] {
-        IDLE,
-        SETUP,
-        PRE_TRIG,
-        POST_TRIG,
-        CLEAN
-        } sampler_state;
-    sampler_state sampler;
-
-    assign clk_adc = clk;
-
-    /****** FSM `*****/
-    always @(posedge clk_adc)
-        case(sampler_state)
-            IDLE: begin
-                if(active)
-                    sampler_state = SETUP;
-            end
-            SETUP: begin
-                m_we    <= 1;
-                m_cs    <= 1;
-                m_addr <= 1;
-                post_samples <= 0;
-                sample_state <= PRE_TRIG;
-            end
-            /* store samples in memmory and add 1 to address and let it
-            * overflow indefinitley (redneck circular-buffer) */
-            PRE_TRIG: begin /* pre-tringer */
-                mem[m_addr] <= data_in;
-                m_addr      <= m_addr+ 1;
-                if(trig)
-                begin
-                    sampler_state <= POST_TRIG;
-                    m_offset <= m_addr;
-                end
-            end
-            /* continue to store samples, but also watch for the number of
-            * amples, if its more than half of of the buffer, goto next */
-            POST_TRIG: begin /* post-trig */
-                mem[m_addr] <= data_in;
-                m_addr <= m_addr + 1;
-                post_samples <= post_samples + 1;
-                if(&post_samples)  /* reduction AND */
-                    sampler_state <= CLEAN;
-            end
-            CLEAN: begin
-                m_we = 0;
-                m_cs = 0;
-                sampler_state <= IDLE;
-            end
-        endcase
+    // activate output adc only when activated
+    assign adc_clk = clk_50mhz && activate_adc_clk;
+    assign mem_clk = clk_50mhz && activate_mem_clk;
 
 
-    /***** TRIGGER LOGIC *****/
+    // TRIGGER LOGIC BEGIN
     reg thr1, thr2;
     always @(posedge clk_adc)
     begin
         thr1 <= (data_in >= 8'h80);
         thr2 <= thr1;
     end
+    assign trig = thr1 & ~thr2; /* assert true for one clock*/
+    // TRIGGER LOGIC END
 
-    /* assert true for one clock at rising edge */
-    assign trig = thr1 & ~thr2;
+
+    /* TODO add clk_divided*/
+
+    always @(posedge clk_50mhz)
+    begin
+        case(sampler_state)
+
+            ST_IDLE:
+                if(activate)
+                    sampler_state = ST_SETUP;
+
+            ST_SETUP: begin
+                done = 0;
+                activate_adc_clk = 1;
+                activate_mem_clk = 1;
+                mem_we = 1;  // enable writing into memory
+                mem_addr = 0;  // start from zero
+                sampler_state = ST_PRE_TRIG;
+                remaining_samples = (1<<(SAMPLE_DEPTH-1))-1; // half of samples
+            end
+
+            /* store samples in memmory and add 1 to address and let it
+            * overflow indefinitley (redneck circular-buffer) */
+            ST_PRE_TRIG: begin
+                mem_addr = mem_addr + 1;
+                mem_data = adc_data;
+                if(trig)
+                begin
+                    sampler_state = ST_POST_TRIG;
+                    samples_trigger_offset = mem_addr;
+                end
+            end
+            ST_POST_TRIG:
+            begin
+                mem_addr = mem_addr + 1;
+                mem_data = adc_data;
+
+                remaining_samples = remaining_samples - 1;
+                if(remaining_samples == 0)
+                    sampler_state = ST_SHIFT;
+            end
+            ST_SHIFT:
+                sampler_state = ST_CLEAR;
+                /* TODO shift samples */
+            ST_CLEAR:
+            begin
+                activate_adc_clk = 0;
+                activate_mem_clk = 0;
+                mem_we = 0;  // enable writing into memory
+                done = 1;
+                sampler_state = ST_IDLE;
+            end
+
+            default:
+            sampler_state = ST_IDLE;
+        endcase
+    end
+
 
 endmodule
