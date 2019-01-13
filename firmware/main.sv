@@ -105,12 +105,12 @@ module main(
 
 
 	// STATE_WATCHER states
-	parameter ST_INIT				= 8'h00;
+	parameter ST_INIT				= 8'hff;
 	parameter ST_TEST				= 8'h11;
 	parameter ST_SAMPLER			= 8'h21;
-	parameter ST_SAMPLE_READ		= 8'h22;
-   	parameter ST_REPLAYER      		= 8'h71;
-	parameter ST_REPLY_CNT			= 8'h72;
+	parameter ST_SAMPLE_READ	= 8'h22;
+   parameter ST_REPLAYER		= 8'h71;
+	parameter ST_REPLY_CNT		= 8'h72;
 
 
 	initial begin
@@ -135,10 +135,10 @@ module main(
 				ST_TEST: 			test_activate 			= 1;
 				ST_SAMPLER:			sampler_activate 		= 1;
 				ST_SAMPLE_READ:		sample_reader_activate 	= 1;
-            	ST_REPLAYER:      	replayer_activate 		= 1;
+            ST_REPLAYER:      	replayer_activate 		= 1;
 				ST_REPLY_CNT:		reply_cnt_activate 		= 1;
 
-				default: // set all activate signals to 0
+				ST_INIT: // set all activate signals to 0
 				begin
 					test_activate = 0;
 					sampler_activate = 0;
