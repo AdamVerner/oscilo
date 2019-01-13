@@ -60,8 +60,17 @@ module main(
 
 	// replayer_instance start
 	wire replayer_activate, replayer_done;
-	assign tx_data = rx_data;
-	assign tx_start = rx_ready;
+    replayer replayer_instance(
+        .clk(CLK),
+        .reset(KEY4),
+        .activate(replayer_activate),
+        . done(replayer_done),
+        .tx_done(tx_done),
+        .rx_ready(rx_ready),
+        .rx_data(rx_data),
+        . tx_data(tx_data),
+        . tx_start(tx_start)
+    );
 	// replayer_instance stop
 
 	
@@ -74,7 +83,8 @@ module main(
 	parameter ST_INIT				= 8'h00;
 	parameter ST_TEST				= 8'h11;
 	parameter ST_SAMPLER			= 8'h21;
-	parameter ST_SAMPLE_READ	= 8'h22;
+	parameter ST_SAMPLE_READ	    = 8'h22;
+    parameter  ST_REPLAYER          = 8'h71;
 	
 	
 	initial begin
@@ -98,13 +108,15 @@ module main(
 			case(state)
 				ST_TEST: 			test_activate = 1;
 				ST_SAMPLER:			sampler_activate = 1;
-				ST_SAMPLE_READ:	sample_reader_activate = 1;
+				ST_SAMPLE_READ:	    sample_reader_activate = 1;
+                ST_REPLAYER:        replayer_activate = 1;
 				
 				default: // set all activate signals to 0
 				begin
 					test_activate = 0;
 					sampler_activate = 0;
 					sample_reader_activate = 0;
+                    replayer_activate = 0;
 					state = ST_INIT; //move back to init on invlaid state
 				end
 			endcase
@@ -113,6 +125,13 @@ module main(
 		
 		if(test_activate && test_done) // watch for module done
 			state = ST_INIT;
+
+        if(replayer_activate && replayer_done)
+            state = ST_INIT;
+
+        if(sample_reader_activate && sample_reader_done)
+            state = ST_INIT;
+
 
 		if(rx_ready && state == ST_INIT)  // watch for state_change request
 		begin
