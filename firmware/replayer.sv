@@ -57,9 +57,9 @@ module replayer(
             ST_DONE:
             begin
                 done = 1;
-					 tx_start = 0;
+                tx_start = 0;
 					 
-                if(~activate)
+                if(~activate & ~rx_ready)
                     state = ST_IDLE;
             end
             default:
