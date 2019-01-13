@@ -150,7 +150,7 @@ module main(
         .reset    (KEY4),
         .activate (test_activate),
         .done     (test_done),
-        .to       (debug[0])
+        .to       ()
     );
     // test instance end
 
@@ -183,6 +183,8 @@ module main(
     initial begin
         state = ST_INIT;
     end
+
+    assign debug = state;
 
     always @(posedge CLK)
         begin
@@ -219,16 +221,16 @@ module main(
 
 
             if (test_activate && test_done) // watch for module done
-                state = ST_INIT;
+                state = ST_READY;
 
             if (replayer_activate && replayer_done)
-                state = ST_INIT;
+                state = ST_READY;
 
             if (sample_reader_activate && sample_reader_done)
-                state = ST_INIT;
+                state = ST_READY;
 
             if (reply_cnt_activate && reply_cnt_done)
-                state = ST_INIT;
+                state = ST_READY;
 
         end
 
