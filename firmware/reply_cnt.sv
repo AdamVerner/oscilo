@@ -29,47 +29,46 @@ module reply_cnt(
         if(~reset) state = ST_IDLE;
 
         case(state)
-            ST_IDLE:
-            begin
+            ST_IDLE: begin
                 tx_start = 0;
                 done = 0;
                 counter = 0;
-                if(activate)
+                //when activated wait for RX line to clean from preious state change
+                if(activate & ~rx_ready)
                     state = ST_RECV;
             end
-            ST_RECV:
-            begin
-                tx_start = 0;
+            ST_RECV: begin
                 if(rx_ready)
                 begin
                     count = rx_data;
                     state = ST_WAIT;
                 end
             end
-            ST_WAIT:
+            ST_WAIT: begin
+                tx_start = 0;
                 if(~tx_active)
                     state = ST_REPLY;
-            ST_REPLY:
-            begin
+            end
+            ST_REPLY: begin
                 tx_data = counter;
                 tx_start = 1;
 
                 counter = counter + 1;
-                if(counter == count)
+
+                if(counter > count)
                     state = ST_DONE;
                 else
                     state = ST_WAIT;
             end
-            ST_DONE:
-            begin
+            ST_DONE: begin
                 done = 1;
                 tx_start = 0;
 
                 if(~activate)
                     state = ST_IDLE;
+
             end
-            default:
-                state = ST_IDLE;
+            default: state = ST_IDLE;
         endcase
     end
 endmodule
