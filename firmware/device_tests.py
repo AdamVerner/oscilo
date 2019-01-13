@@ -19,7 +19,6 @@ class MainTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.serial_device.close()
 
-
     def setUp(self):
         self.serial_device.reset_input_buffer()
         self.serial_device.reset_output_buffer()
@@ -46,10 +45,6 @@ class MainTest(unittest.TestCase):
         self.serial_device.write(b'\x2a')  # 2a = dec(42)
         for number in range(0, 42, 1):
             self.assertEqual(self.serial_device.read(1), chr(number).encode('utf-8'))
-
-
-
-
 
 
 if __name__ == '__main__':

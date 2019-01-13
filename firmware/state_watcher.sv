@@ -7,32 +7,32 @@
 */
 
 module state_watcher(
-	/* inputs */
-	Rx_ready, Rx_data, reset,
-	/* outputs */
-	state, state_change
-	);
+    /* inputs */
+    Rx_ready, Rx_data, reset,
+    /* outputs */
+    state, state_change
+);
 
-	parameter [7:0]	module_id = 8'h00;
+    parameter [7:0] module_id = 8'h00;
 
-	input		Rx_ready;
-	input [7:0]	Rx_data;
-	input 		reset;
-	
-	output wire[7:0]	state;
-	output 	state_change;
+    input             Rx_ready;
+    input       [7:0] Rx_data;
+    input             reset;
 
-	reg [7:0] state_temp;
-	reg 	  state_change_temp;
+    output wire [7:0] state;
+    output            state_change;
 
-	assign state_change = state_change_temp;
-	assign state = state_temp;
+    reg [7:0]         state_temp;
+    reg               state_change_temp;
 
-
+    assign state_change = state_change_temp;
+    assign state = state_temp;
 
 
-	always @(negedge Rx_ready)
-		state_change_temp <= 0;
-	
+
+
+    always @(negedge Rx_ready)
+        state_change_temp <= 0;
+
 
 endmodule
