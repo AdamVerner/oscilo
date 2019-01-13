@@ -6,16 +6,15 @@ module replayer(
     input activate,
     output done,
 
-    input tx_done,
+    input tx_done, tx_active,
     input rx_ready,
-    input rx_data,
+    input [7:0] rx_data,
 
-    output tx_data,
+    output [7:0] tx_data,
     output tx_start
-
 );
 
-    reg [2:0] state;
+    reg [3:0] state;
 
     parameter ST_IDLE   = 0;
     parameter ST_RECV   = 1;
@@ -27,8 +26,8 @@ module replayer(
         case(state)
             ST_IDLE:
             begin
-                tx_data  = 8'hz;
-                tx_start = 1'bz;
+                tx_start = 0;
+					 done = 0;
                 if(activate)
                     state = ST_RECV;
             end
@@ -55,6 +54,8 @@ module replayer(
             ST_DONE:
             begin
                 done = 1;
+					 tx_start = 0;
+					 
                 if(~activate)
                     state = ST_IDLE;
             end

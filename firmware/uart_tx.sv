@@ -13,7 +13,7 @@ module uart_tx
   (
    input       clk,
    input       start,
-   input [7:0] data_in,
+   input [7:0] data,
    output      active,
    output reg  txd,
    output      done
@@ -46,7 +46,7 @@ module uart_tx
             if (start == 1'b1)
               begin
                 r_Tx_Active <= 1'b1;
-                r_Tx_Data   <= data_in;
+                r_Tx_Data   <= data;
                 r_SM_Main   <= st_TX_START_BIT;
               end
             else

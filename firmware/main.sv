@@ -24,7 +24,7 @@ module main(
 	
 
 	uart_rx reciever  (.clk(CLK), .rxd(RXD), .rx_rd(rx_ready), .rx_data(rx_data));
-	uart_tx transmiter(.clk(CLK), .txd(TXD), .start(tx_start), .data_in(tx_data), .active(tx_active), .done(tx_done));
+	uart_tx transmiter(.clk(CLK), .txd(TXD), .start(tx_start), .data(tx_data), .active(tx_active), .done(tx_done));
 
 	seven_segment segmentdisplay(.clk_50mhz(CLK), .reset(KEY4),
 								 .bcd1(4'h0), .bcd2(4'h0), .bcd3(state[3:0]), .bcd4(state[7:4]),
@@ -60,17 +60,7 @@ module main(
 
 	// replayer_instance start
 	wire replayer_activate, replayer_done;
-    replayer replayer_instance(
-        .clk(CLK),
-        .reset(KEY4),
-        .activate(replayer_activate),
-        . done(replayer_done),
-        .tx_done(tx_done),
-        .rx_ready(rx_ready),
-        .rx_data(rx_data),
-        . tx_data(tx_data),
-        . tx_start(tx_start)
-    );
+   replayer replayer_instance(.clk(CLK), .reset(KEY4), .activate(replayer_activate), .done(replayer_done), .tx_done(tx_done), .rx_ready(rx_ready), .rx_data(rx_data), .tx_data(tx_data), .tx_start(tx_start), .tx_active(tx_active));
 	// replayer_instance stop
 
 	
@@ -83,8 +73,8 @@ module main(
 	parameter ST_INIT				= 8'h00;
 	parameter ST_TEST				= 8'h11;
 	parameter ST_SAMPLER			= 8'h21;
-	parameter ST_SAMPLE_READ	    = 8'h22;
-    parameter  ST_REPLAYER          = 8'h71;
+	parameter ST_SAMPLE_READ	= 8'h22;
+   parameter ST_REPLAYER      = 8'h71;
 	
 	
 	initial begin
@@ -108,16 +98,15 @@ module main(
 			case(state)
 				ST_TEST: 			test_activate = 1;
 				ST_SAMPLER:			sampler_activate = 1;
-				ST_SAMPLE_READ:	    sample_reader_activate = 1;
-                ST_REPLAYER:        replayer_activate = 1;
+				ST_SAMPLE_READ:	sample_reader_activate = 1;
+            ST_REPLAYER:      replayer_activate = 1;
 				
 				default: // set all activate signals to 0
 				begin
 					test_activate = 0;
 					sampler_activate = 0;
 					sample_reader_activate = 0;
-                    replayer_activate = 0;
-					state = ST_INIT; //move back to init on invlaid state
+               replayer_activate = 0;
 				end
 			endcase
 		end
