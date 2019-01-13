@@ -55,9 +55,9 @@ module reply_cnt(
                     tx_data = counter;
                     tx_start = 1;
 
-                    counter = counter+1;
+                    counter = counter + 1'b1;
 
-                    if (counter > count)
+                    if (counter >= count)
                         state = ST_DONE;
                     else
                         state = ST_WAIT;

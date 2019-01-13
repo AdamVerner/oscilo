@@ -3,6 +3,7 @@
 
 from serial import Serial
 import unittest
+import logging
 
 """
 some tests to run on final device
@@ -10,9 +11,11 @@ some tests to run on final device
 
 
 class MainTest(unittest.TestCase):
+    log = logging.getLogger(__name__)
 
     @classmethod
     def setUpClass(cls):
+        cls.log.setLevel(logging.DEBUG)
         cls.serial_device = Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=1)
 
     @classmethod
@@ -43,8 +46,14 @@ class MainTest(unittest.TestCase):
         self.serial_device.write(b'\x72')  # select module
 
         self.serial_device.write(b'\x2a')  # 2a = dec(42)
-        for number in range(0, 42, 1):
-            self.assertEqual(self.serial_device.read(1), chr(number).encode('utf-8'))
+
+        data = self.serial_device.read(0x2a)
+
+        expected = b''.join([chr(number).encode('utf-8') for number in range(0, 42, 2)])
+
+        self.assertEqual(len(data), len(expected))
+
+        self.assertEqual(data, expected)
 
 
 if __name__ == '__main__':
