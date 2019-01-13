@@ -55,14 +55,15 @@ module main(
 
 	// sample_reader_instance start
 	wire sample_reader_activate, sample_reader_done;
-
 	// sample_reader_instance stop
+
 
 	// replayer_instance start
 	wire replayer_activate, replayer_done;
     wire [7:0] replayer_tx_data, replayer_tx_start;
 	replayer replayer_instance(.clk(CLK), .reset(KEY4), .activate(replayer_activate), .done(replayer_done), .tx_done(tx_done), .rx_ready(rx_ready), .rx_data(rx_data), .tx_data(replayer_tx_data), .tx_start(replayer_tx_start), .tx_active(tx_active));
 	// replayer_instance stop
+
 
 	// reply_cnt_instance start
 	wire reply_cnt_activate, reply_cnt_done;
@@ -91,20 +92,16 @@ module main(
     // UART_TX MANAGER START
 	 always @(posedge CLK)
 	 begin
-		 if(replayer_activate)
-		 begin
+		 if(replayer_activate) begin
 			  tx_data  = replayer_tx_data;
 			  tx_start = replayer_tx_start;
-		 end
-		 else if (reply_cnt_activate)
-		 begin
+		 end else if (reply_cnt_activate) begin
 			  tx_data  = reply_cnt_tx_data;
 			  tx_start = reply_cnt_tx_start;
-		 end
+		 end else
+			 tx_start = 0;
 	 end
     // UART_TX MANAGER START
-
-
 
 
 	// STATE_WATCHER states
