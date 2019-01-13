@@ -25,6 +25,7 @@ module reply_cnt(
     parameter ST_WAIT = 2;
     parameter ST_REPLY = 3;
     parameter ST_DONE = 4;
+    parameter ST_INTER = 5;
 
     always @(posedge clk)
         begin
@@ -49,8 +50,11 @@ module reply_cnt(
                 ST_WAIT: begin
                     tx_start = 0;
                     if (~tx_active)
-                        state = ST_REPLY;
+                        state = ST_INTER;
                 end
+
+                ST_INTER: state = ST_REPLY;
+
                 ST_REPLY: begin
                     tx_data = counter;
                     tx_start = 1;
