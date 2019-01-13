@@ -89,15 +89,19 @@ module main(
 
 
     // UART_TX MANAGER START
-    if(replayer_activate)
-    begin
-        assign tx_data  = replayer_tx_data;
-        assign tx_start = replayer_tx_start;
-    end
-    else if (reply_cnt_activate)
-    begin
-        assign tx_data  = reply_cnt_tx_data;
-        assign tx_start = reply_cnt_tx_start;
+	 always @(posedge CLK)
+	 begin
+		 if(replayer_activate)
+		 begin
+			  tx_data  = replayer_tx_data;
+			  tx_start = replayer_tx_start;
+		 end
+		 else if (reply_cnt_activate)
+		 begin
+			  tx_data  = reply_cnt_tx_data;
+			  tx_start = reply_cnt_tx_start;
+		 end
+	 end
     // UART_TX MANAGER START
 
 

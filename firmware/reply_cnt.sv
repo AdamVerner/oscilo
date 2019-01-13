@@ -16,7 +16,6 @@ module reply_cnt(
 
     reg [7:0] count;
     reg [7:0] counter;
-
     reg [3:0] state;
 
     parameter ST_IDLE   = 0;
