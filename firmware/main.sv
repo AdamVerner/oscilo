@@ -215,7 +215,8 @@ module main(
                                 reply_cnt_activate = 0;
                             end
                         ST_READY:
-                            state = ST_INIT; // TODO wait for all signals to go down(rx_ready, tx_active...)
+                            if(~rx_ready && ~tx_active)
+                            state = ST_INIT;
                     endcase
                 end
 
