@@ -20,7 +20,6 @@ module main(
     wire       tx_start, tx_active, tx_done;
 
     reg [7:0]  state;
-    wire       state_change;
 
 
     uart_rx reciever(
@@ -182,7 +181,6 @@ module main(
 
 
     initial begin
-        state_change = 0;
         state = ST_INIT;
     end
 
@@ -191,34 +189,33 @@ module main(
 
             if (~KEY4) //reset
                 begin
-                    state_change = 0;
-                    state = ST_INIT;
+                    state = ST_READY;
                     // no need to specify *_activate signals as they'll get set to zero in next clk run
                 end
 
+            case (state)
+                ST_TEST: test_activate = 1;
+                ST_SAMPLER: sampler_activate = 1;
+                ST_SAMPLE_READ: sample_reader_activate = 1;
+                ST_REPLAYER: replayer_activate = 1;
+                ST_REPLY_CNT: reply_cnt_activate = 1;
 
-            if (state_change) // watch for state_change and if changed activate appropriate module
+                ST_INIT:
+                    if(rx_ready)
+                        state = rx_data;
+
+                ST_READY:
                 begin
-                    case (state)
-                        ST_TEST: test_activate = 1;
-                        ST_SAMPLER: sampler_activate = 1;
-                        ST_SAMPLE_READ: sample_reader_activate = 1;
-                        ST_REPLAYER: replayer_activate = 1;
-                        ST_REPLY_CNT: reply_cnt_activate = 1;
+                    test_activate = 0;
+                    sampler_activate = 0;
+                    sample_reader_activate = 0;
+                    replayer_activate = 0;
+                    reply_cnt_activate = 0;
 
-                        ST_INIT: // set all activate signals to 0
-                            begin
-                                test_activate = 0;
-                                sampler_activate = 0;
-                                sample_reader_activate = 0;
-                                replayer_activate = 0;
-                                reply_cnt_activate = 0;
-                            end
-                        ST_READY:
-                            if(~rx_ready && ~tx_active)
-                            state = ST_INIT;
-                    endcase
+                    if(~rx_ready && ~tx_active)
+                    state = ST_INIT;
                 end
+            endcase
 
 
             if (test_activate && test_done) // watch for module done
@@ -232,15 +229,6 @@ module main(
 
             if (reply_cnt_activate && reply_cnt_done)
                 state = ST_INIT;
-
-
-            if (rx_ready && state == ST_INIT)  // watch for state_change request
-                begin
-                    state_change = 1;
-                    state = rx_data;
-                end else begin
-                state_change = 0;
-            end
 
         end
 
