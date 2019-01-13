@@ -105,7 +105,8 @@ module main(
 
 
 	// STATE_WATCHER states
-	parameter ST_INIT				= 8'hff;
+	parameter ST_READY				= 8'h01;  // just wait one clk cycle
+	parameter ST_INIT				= 8'h00;
 	parameter ST_TEST				= 8'h11;
 	parameter ST_SAMPLER			= 8'h21;
 	parameter ST_SAMPLE_READ	= 8'h22;
@@ -146,6 +147,8 @@ module main(
                		replayer_activate = 0;
 					reply_cnt_activate = 0;
 				end
+				ST_READY:
+				 state = ST_INIT; // TODO wait for all signals to go down(rx_ready, tx_active...)
 			endcase
 		end
 

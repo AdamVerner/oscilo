@@ -64,7 +64,7 @@ module reply_cnt(
                 done = 1;
                 tx_start = 0;
 
-                if(~activate & ~rx_ready)
+                if(~activate & ~rx_ready & ~tx_active)
                     state = ST_IDLE;
 
             end
