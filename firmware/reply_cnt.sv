@@ -1,6 +1,6 @@
 // replys back bytes till 0x55 is received
 
-module replayer(
+module reply_cnt(
     input clk, reset,
 
     input activate,
@@ -13,6 +13,9 @@ module replayer(
     output [7:0] tx_data,
     output tx_start
 );
+
+    reg [7:0] count;
+    reg [7:0] counter;
 
     reg [3:0] state;
 
@@ -30,7 +33,8 @@ module replayer(
             ST_IDLE:
             begin
                 tx_start = 0;
-					 done = 0;
+                done = 0;
+                counter = 0;
                 if(activate)
                     state = ST_RECV;
             end
@@ -39,7 +43,7 @@ module replayer(
                 tx_start = 0;
                 if(rx_ready)
                 begin
-                    tx_data = rx_data;
+                    count = rx_data;
                     state = ST_WAIT;
                 end
             end
@@ -48,17 +52,20 @@ module replayer(
                     state = ST_REPLY;
             ST_REPLY:
             begin
+                tx_data = counter;
                 tx_start = 1;
-                if(rx_data == 8'h55)
+
+                counter = counter + 1;
+                if(counter == count)
                     state = ST_DONE;
                 else
-                    state = ST_RECV;
+                    state = ST_WAIT;
             end
             ST_DONE:
             begin
                 done = 1;
-					 tx_start = 0;
-					 
+                tx_start = 0;
+
                 if(~activate)
                     state = ST_IDLE;
             end
