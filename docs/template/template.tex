@@ -35,6 +35,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[czech]{babel}
 
+\usepackage[colorlinks]{hyperref}
+
+
 \begin{document}
 
 %----------------------------------------------------------------------------------------
@@ -43,17 +46,24 @@
 
 \begin{titlepage}
 
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
 
 \center % Center everything on the page
 
-\textsc{\LARGE University Name}\\[1.5cm] % Name of your university/college
-\textsc{\Large Major Heading}\\[0.5cm] % Major heading such as course name
-\textsc{\large Minor Heading}\\[0.5cm] % Minor heading such as course title
+\includegraphics[height=2.5cm,keepaspectratio]{Praha_logo.eps} 
+\includegraphics[height=2.5cm,keepaspectratio]{SPS-Prosek_logo.jpg}\\[3cm]
 
-\HRule \\[0.4cm]
-{ \huge \bfseries Title}\\[0.4cm] % Title of your document
-\HRule \\[1.5cm]
+\textsc{\large OBOR}\\[0.5cm] % Name of your university/college
+
+\textsc{\large 26-41-M/01 ELEKTROTECHNIKA}\\
+\textsc{\large (ŠVP: Průmyslová automatizace a inteligentní budovy)}\\[3cm]
+
+\textsc{\LARGE MATURITNÍ PROJEKT}\\[1.5cm]
+
+\textsc{TÉMA PRÁCE}\\[1.5cm]
+
+{\color{red} \huge \bfseries  TÉMA PROJEKTU (ČERVENÝ TEXT NAHRAĎTĚ)} % Title of your document
+
+\newpage
 
 \begin{minipage}{0.4\textwidth}
 \begin{flushleft} \large
@@ -68,10 +78,6 @@ John \textsc{Smith} % Your name
 Dr. James \textsc{Smith} % Supervisor's Name
 \end{flushright}
 \end{minipage}\\[4cm]
-
-{\large \today}\\[3cm] % Date, change the \today to a set date if you want to be precise
-
-%\includegraphics{Logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
 
 \vfill % Fill the rest of the page with whitespace
 
