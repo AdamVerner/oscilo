@@ -6,8 +6,7 @@ module main(
     output       TXD,
 
     input        KEY4,  // RESET
-
-    output [7:0] debug,  // test only
+    input        KEY4,  // RESET
 
     output       DS_A, DS_B, DS_C, DS_D, DS_E, DS_F, DS_G,
     output       DSEN_1, DSEN_2, DSEN_3, DSEN_4 // active LOW
@@ -183,8 +182,6 @@ module main(
     initial begin
         state = ST_INIT;
     end
-
-    assign debug = state;
 
     always @(posedge CLK)
         begin
