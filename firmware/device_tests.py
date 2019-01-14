@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from serial import Serial
+from time import sleep
 import unittest
 import logging
 
@@ -46,10 +47,11 @@ class MainTest(unittest.TestCase):
         self.serial_device.write(b'\x72')  # select module
 
         self.serial_device.write(b'\x2a')  # 2a = dec(42)
+        sleep(3.2)
 
         data = self.serial_device.read(0x2a)
 
-        expected = b''.join([chr(number).encode('utf-8') for number in range(0, 42, 2)])
+        expected = b''.join([chr(number).encode('utf-8') for number in range(0, 42, 1)])
 
         self.assertEqual(len(data), len(expected))
 
