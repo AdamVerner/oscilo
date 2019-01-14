@@ -16,6 +16,8 @@ module reply_cnt(
     output       tx_start
     );
 
+    reg [22:0] sleep_counter;  // max = 8388607
+
     reg [7:0] count;
     reg [7:0] counter;
     reg [3:0] state;
@@ -50,11 +52,18 @@ module reply_cnt(
                 ST_WAIT: begin
                     tx_start = 0;
                     if (~tx_active)
+                        begin
                         state = ST_INTER;
+                        sleep_counter = 0;
+                        end
                 end
 
-                ST_INTER: state = ST_REPLY;
+                ST_INTER: begin // TODO optimalize sleep times
+                    sleep_counter = sleep_counter + 1;
+                    if(sleep_counter >= 5000000) // wait 0.1 sec
 
+                        state = ST_REPLY;
+                end
                 ST_REPLY: begin
                     tx_data = counter;
                     tx_start = 1;
