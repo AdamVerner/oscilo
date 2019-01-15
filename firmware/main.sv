@@ -142,18 +142,6 @@ module main(
     // reply_cnt_instance stop
 
 
-    // test instance start
-    wire       test_activate, test_done;
-    test testinstance(
-        .clk_50mhz(CLK),
-        .reset    (KEY4),
-        .activate (test_activate),
-        .done     (test_done),
-        .to       ()
-    );
-    // test instance end
-
-
     // UART_TX MANAGER START
     always @(posedge CLK)
         begin
@@ -172,7 +160,6 @@ module main(
     // STATE_WATCHER states
     parameter ST_READY = 8'h01;  // just wait one clk cycle
     parameter ST_INIT = 8'h00;
-    parameter ST_TEST = 8'h11;
     parameter ST_SAMPLER = 8'h21;
     parameter ST_SAMPLE_READ = 8'h22;
     parameter ST_REPLAYER = 8'h71;
@@ -193,7 +180,6 @@ module main(
                 end
 
             case (state)
-                ST_TEST: test_activate = 1;
                 ST_SAMPLER: sampler_activate = 1;
                 ST_SAMPLE_READ: sample_reader_activate = 1;
                 ST_REPLAYER: replayer_activate = 1;
@@ -205,7 +191,6 @@ module main(
 
                 ST_READY:
                 begin
-                    test_activate = 0;
                     sampler_activate = 0;
                     sample_reader_activate = 0;
                     replayer_activate = 0;
@@ -216,9 +201,6 @@ module main(
                 end
             endcase
 
-
-            if (test_activate && test_done) // watch for module done
-                state = ST_READY;
 
             if (replayer_activate && replayer_done)
                 state = ST_READY;
