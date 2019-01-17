@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% @Author: Adam Verner
 % Note:
 % The \lipsum[#] commands throughout this template generate dummy text
 % to fill the template out. These commands should all be removed when 
@@ -11,9 +11,17 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
+\documentclass[12pt,a4paper]{article} % Default font size is 12pt, it can be changed here
 
-\documentclass[12pt]{article} % Default font size is 12pt, it can be changed here
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\baselinestretch}{1.5} 
 
+% right should be 2, but that behaves weridly
+% copied from LibreOffice
+\usepackage[left=3cm, right=3cm, top=1.25cm, bottom=2.5cm]{geometry} 
+
+\usepackage{hyperref}
 
 \usepackage{geometry} % Required to change the page size to A4
 \geometry{a4paper} % Set the page size to be A4 as opposed to the default US Letter
@@ -27,17 +35,18 @@
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 
-\linespread{1.2} % Line spacing
+\usepackage{mathptmx}
+\usepackage{anyfontsize}
+\usepackage{t1enc}
 
-%\setlength\parindent{0pt} % Uncomment to remove all indentation from paragraphs
+
+\setlength\parindent{35pt}
 
 \graphicspath{{Pictures/}} % Specifies the directory where pictures are stored
 
 % use packages to support czech
 \usepackage[utf8]{inputenc}
 \usepackage[czech]{babel}
-
-\usepackage[colorlinks]{hyperref}
 
 
 \begin{document}
@@ -63,25 +72,20 @@
 \center
 
 \textbf{\large OBOR}\\[0.5cm]
-
 \textbf{\large	26-41-M/01 ELEKTROTECHNIKA\\
 				(ŠVP: Průmyslová automatizace a inteligentní budovy)}\\[1cm]
-
 \textbf{\LARGE MATURITNÍ PROJEKT}\\[1.5cm]
-
 \textsc{TÉMA PRÁCE}\\[1.5cm]
-
-\textbf{\color{red} \huge \bfseries  TÉMA PROJEKTU (ČERVENÝ TEXT NAHRAĎTĚ)} % Title of your document
-
+\textbf{\color{red} \huge \bfseries  TÉMA PROJEKTU (ČERVENÝ TEXT NAHRAĎTĚ)}
 
 \vspace*{\fill}
 
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{flushleft} \large
 \the\year % insert current year
 \end{flushleft}
 \end{minipage}
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{flushright}
 \textcolor{red}{\large AUTOR (PŘÍJMENÍ Jméno)}
 \end{flushright}
@@ -89,6 +93,90 @@
 
 \end{titlepage}
 
+%----------------------------------------------------------------------------------------
+%	LIST SE ZADÁNÍM
+%----------------------------------------------------------------------------------------
+\textbf{\color{red} \LARGE MÍSTO TOHOTO LISTU VLOŽTE LIST SE ZADÁNÍM}
+\newpage
+
+%----------------------------------------------------------------------------------------
+%	PROHLÁŠENÍ
+%----------------------------------------------------------------------------------------
+\textsc{\textbf{\fontsize{20pt}{0}\selectfont prohlášení}}\\
+
+{Prohlašuji, že jsem svou maturitní práci vypracoval samostatně a použil jsem pouze podklady (literaturu, projekty, SW, atd.) uvedené v seznamu.
+}\\
+
+{Nemám závažný důvod proti užití tohoto školního díla ve smyslu § 60 zákona č. 121/2000 Sb., o právu autorském, o právech souvisejících s právem autorským a o změně některých zákonů (autorský zákon).}\\[0.5cm]
+
+\begin{minipage}{0.49\textwidth}
+\begin{flushleft}
+{V Praze dne \today}\\% insert current year
+\bigskip
+\bigskip
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\begin{flushright}
+\centering
+{
+..........................................\\
+podpis
+}
+\end{flushright}
+\end{minipage}
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	PODĚKOVÁNÍ
+%----------------------------------------------------------------------------------------
+\textsc{\textbf{\fontsize{20pt}{0}\selectfont poděkování}}\\
+
+{\color{red} Text poděkování …. Běžně se děkuje rodinným příslušníkům za jejich morální podporu, vedoucí práce za její vedení, dalším konkrétním učitelům a konzultantům za věcné připomínky atd.}
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	ANOTACE
+%----------------------------------------------------------------------------------------
+\textsc{\textbf{\fontsize{20pt}{0}\selectfont anotace}}\\
+
+
+\begin{table}[htb]
+
+	\begin{tabular}{|p{0.3\linewidth}|p{0.8\linewidth}|} \hline
+	Jméno autora          & \\ \hline
+	Název maturitní práce & {\color{red} Musí se shodovat s oficiálním názvem práce v zadání}										\\ \hline
+	Rozsah práce          & {\color{red} Počet stran práce ve formátu (např. 165 s. + 50 s. příloh)}									\\ \hline
+	Školní rok vyhotovení & 2019 \\ \hline
+	Škola                 & Střední průmyslová škola na Proseku \\ \hline
+	Vedoucí práce         & \\ \hline
+	Využití práce         & {\color{red} Zde popište použití práce, např. výukové účely v oboru Telekomunikace v předmětu tom a tom}					\\ \hline
+	Abstrakt              & {\color{red} Např. Práce je zaměřena na návrh webové aplikace pro evidenci ...} \\ \hline
+	Klíčová slova         & {\color{red} Zde uveďte klíčová slova práce, tj. slova, která definují její obsah, např. webové stránky, skriptovací jazyky, syntaxe,...} \\ \hline
+	\end{tabular}
+\end{table}
+\newpage
+%----------------------------------------------------------------------------------------
+%	ANNOTATIONS
+%----------------------------------------------------------------------------------------
+\section*{annotation}
+
+\begin{table}[htb]
+	\begin{tabular}{|p{0.3\linewidth}|p{0.8\linewidth}|} \hline
+	Autor                    &							\\ \hline
+	Title of graduation work &							\\ \hline
+	Extend                   & {\color{red} e.g.: 165 p. + 50 p. of appendices}	\\ \hline
+	Academic year            & 2019							\\ \hline
+	School                   & Střední průmyslová škola na Proseku			\\ \hline
+	Supervisor               &							\\ \hline
+	Application              &							\\ \hline
+	Abstrakt                 &							\\ \hline
+	Key words                &                          \\ \hline 
+	\end{tabular}
+\end{table}
+
+
+\newpage
 %----------------------------------------------------------------------------------------
 %	TABLE OF CONTENTS
 %----------------------------------------------------------------------------------------
@@ -103,7 +191,7 @@
 
 \section{Úvod} % Major section
 
-Example citation \cite{Figueredo:2009dg}.
+Example citation \cite{1}.
 
 %------------------------------------------------
 
@@ -203,11 +291,8 @@ Example citation \cite{Figueredo:2009dg}.
 
 \begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
 
-\bibitem[Figueredo and Wolf, 2009]{Figueredo:2009dg}
-Figueredo, A.~J. and Wolf, P. S.~A. (2009).
-\newblock Assortative pairing and life history strategy - a cross-cultural
-  study.
-\newblock {\em Human Nature}, 20:317--330.
+\bibitem[1]{1} Seznam citací dle ISO 690 (např. dle \url{www.boldis.cz/citace/citace2.pdf})
+\bibitem[2]{2} Nebo dle generátoru citací na \url{www.citace.com}
  
 \end{thebibliography}
 
