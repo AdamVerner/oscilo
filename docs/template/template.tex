@@ -17,6 +17,8 @@
 \renewcommand{\familydefault}{\sfdefault}
 \renewcommand{\baselinestretch}{1.5} 
 
+\usepackage[nottoc,numbib]{tocbibind}  % include bibliography
+
 % right should be 2, but that behaves weridly
 % copied from LibreOffice
 \usepackage[left=3cm, right=3cm, top=1.25cm, bottom=2.5cm]{geometry} 
@@ -57,23 +59,23 @@
 
 \begin{titlepage}
 
-\begin{minipage}{0.20\textwidth}
+\begin{minipage}{0.15\textwidth}
 	\includegraphics[height=\textwidth]{Praha_logo.eps}
 \end{minipage}
-\begin{minipage}{0.20\textwidth}
+\begin{minipage}{0.3\textwidth}
 	\includegraphics[height=\textwidth]{SPS-Prosek_logo.jpg}
 \end{minipage}
-\begin{adjustbox}{minipage=0.6\textwidth,left}
+\begin{adjustbox}{minipage=0.55\textwidth,left}
 	\textbf{\textcolor{darkgray}{
 	Střední průmyslová škola na Proseku\\
 	90 00 Praha 9, Novoborská 2}}
-\end{adjustbox}\\[1cm]
+\end{adjustbox}
 
 \center
 
 \textbf{\large OBOR}\\[0.5cm]
 \textbf{\large	26-41-M/01 ELEKTROTECHNIKA\\
-				(ŠVP: Průmyslová automatizace a inteligentní budovy)}\\[1cm]
+				(ŠVP: Průmyslová automatizace a inteligentní budovy)}\\[4.5cm]
 \textbf{\LARGE MATURITNÍ PROJEKT}\\[1.5cm]
 \textsc{TÉMA PRÁCE}\\[1.5cm]
 \textbf{\color{red} \huge \bfseries  TÉMA PROJEKTU (ČERVENÝ TEXT NAHRAĎTĚ)}
@@ -138,6 +140,7 @@ podpis
 %----------------------------------------------------------------------------------------
 %	ANOTACE
 %----------------------------------------------------------------------------------------
+
 \textsc{\textbf{\fontsize{20pt}{0}\selectfont anotace}}\\
 
 
