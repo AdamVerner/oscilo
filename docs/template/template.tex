@@ -15,7 +15,9 @@
 
 % right should be 2, but that behaves weridly
 % copied from LibreOffice
-\usepackage[left=3cm, right=3cm, top=1.25cm, bottom=2.5cm,includehead,includefoot]{geometry} 
+\usepackage[left=3cm, right=3cm, top=-1cm, bottom=2.5cm,includehead,includefoot]{geometry} 
+
+
 
 % header & footer START
 \usepackage{fancyhdr}
@@ -102,7 +104,12 @@
 \end{flushright}
 \end{minipage}
 
+
 \end{titlepage}
+
+
+\newgeometry{left=3cm, right=3cm, top=1.25cm, bottom=2.5cm,includehead,includefoot}
+
 
 %----------------------------------------------------------------------------------------
 %	LIST SE ZADÁNÍM
