@@ -13,15 +13,25 @@
 
 \documentclass[12pt,a4paper]{article} % Default font size is 12pt, it can be changed here
 
+% right should be 2, but that behaves weridly
+% copied from LibreOffice
+\usepackage[left=3cm, right=3cm, top=1.25cm, bottom=2.5cm,includehead,includefoot]{geometry} 
+
+% header & footer START
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Střední průmyslová škola na Proseku}
+\rhead{26-41-M/01 Elektrotechnika}
+\renewcommand{\headrulewidth}{0.4pt}
+% header & footer STOP
+
+
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
-\renewcommand{\baselinestretch}{1.5} 
+\renewcommand{\baselinestretch}{1.5} % line spacing
 
 \usepackage[nottoc,numbib]{tocbibind}  % include bibliography
 
-% right should be 2, but that behaves weridly
-% copied from LibreOffice
-\usepackage[left=3cm, right=3cm, top=1.25cm, bottom=2.5cm]{geometry} 
 
 \usepackage{hyperref}
 
@@ -42,14 +52,13 @@
 \usepackage{t1enc}
 
 
-\setlength\parindent{35pt}
+\setlength\parindent{35pt}  % odrazeni odstavce
 
 \graphicspath{{Pictures/}} % Specifies the directory where pictures are stored
 
 % use packages to support czech
 \usepackage[utf8]{inputenc}
 \usepackage[czech]{babel}
-
 
 \begin{document}
 
@@ -146,7 +155,7 @@ podpis
 
 \begin{table}[htb]
 
-	\begin{tabular}{|p{0.3\linewidth}|p{0.8\linewidth}|} \hline
+	\begin{tabular}{|p{0.3\linewidth}|p{0.65\linewidth}|} \hline
 	Jméno autora          & \\ \hline
 	Název maturitní práce & {\color{red} Musí se shodovat s oficiálním názvem práce v zadání}										\\ \hline
 	Rozsah práce          & {\color{red} Počet stran práce ve formátu (např. 165 s. + 50 s. příloh)}									\\ \hline
@@ -165,7 +174,7 @@ podpis
 \section*{annotation}
 
 \begin{table}[htb]
-	\begin{tabular}{|p{0.3\linewidth}|p{0.8\linewidth}|} \hline
+	\begin{tabular}{|p{0.3\linewidth}|p{0.65\linewidth}|} \hline
 	Autor                    &							\\ \hline
 	Title of graduation work &							\\ \hline
 	Extend                   & {\color{red} e.g.: 165 p. + 50 p. of appendices}	\\ \hline
