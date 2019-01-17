@@ -21,7 +21,9 @@
 \usepackage{graphicx} % Required for including pictures
 
 \usepackage{float} % Allows putting an [H] in \begin{figure} to specify the exact location of the figure
-\usepackage{wrapfig} % Allows in-line images such as the example fish picture
+\usepackage{wrapfig}
+\usepackage{adjustbox}
+\usepackage{xcolor}
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 
@@ -47,10 +49,21 @@
 \begin{titlepage}
 
 
+\begin{minipage}{0.20\textwidth}
+	\includegraphics[height=\textwidth]{Praha_logo.eps}
+\end{minipage}
+\begin{minipage}{0.20\textwidth}
+	\includegraphics[height=\textwidth]{SPS-Prosek_logo.jpg}
+\end{minipage}
+\begin{adjustbox}{minipage=0.6\textwidth,left}
+	\textcolor{darkgray}{
+	Střední průmyslová škola na Proseku\\
+	90 00 Praha 9, Novoborská 2}
+\end{adjustbox}
+\vspace{1cm}
+
 \center % Center everything on the page
 
-\includegraphics[height=2.5cm,keepaspectratio]{Praha_logo.eps} 
-\includegraphics[height=2.5cm,keepaspectratio]{SPS-Prosek_logo.jpg}\\[3cm]
 
 \textsc{\large OBOR}\\[0.5cm] % Name of your university/college
 
