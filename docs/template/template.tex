@@ -120,7 +120,7 @@
 %----------------------------------------------------------------------------------------
 %	PROHLÁŠENÍ
 %----------------------------------------------------------------------------------------
-\textsc{\textbf{\fontsize{20pt}{0}\selectfont prohlášení}}\\
+\section*{PROHLÁŠENÍ}
 
 {Prohlašuji, že jsem svou maturitní práci vypracoval samostatně a použil jsem pouze podklady (literaturu, projekty, SW, atd.) uvedené v seznamu.
 }\\
@@ -156,9 +156,7 @@ podpis
 %----------------------------------------------------------------------------------------
 %	ANOTACE
 %----------------------------------------------------------------------------------------
-
-\textsc{\textbf{\fontsize{20pt}{0}\selectfont anotace}}\\
-
+\section*{ANOTACE}
 
 \begin{table}[htb]
 
@@ -178,7 +176,7 @@ podpis
 %----------------------------------------------------------------------------------------
 %	ANNOTATIONS
 %----------------------------------------------------------------------------------------
-\section*{annotation}
+\section*{ANNOTATION}
 
 \begin{table}[htb]
 	\begin{tabular}{|p{0.3\linewidth}|p{0.65\linewidth}|} \hline
@@ -202,7 +200,7 @@ podpis
 
 \tableofcontents % Include a table of contents
 
-\newpage % Begins the essay on a new page instead of on the same page as the table of contents 
+\newpage
 
 %----------------------------------------------------------------------------------------
 %	INTRODUCTIONlipsum
@@ -210,13 +208,15 @@ podpis
 
 \section{Úvod} % Major section
 
-Example citation \cite{1}.
+{\color{red} Text}
 
 %------------------------------------------------
 
 \subsection{Část 1} % Sub-section
 
+{\color{red} Název kapitol bez teček a každá na nové stránce.}\\\\
 \lipsum[1] % Dummy text
+Example citation \cite{1}.
 
 %------------------------------------------------
 
@@ -302,7 +302,7 @@ Example citation \cite{1}.
 
 \section{Závěr} % Major section
 
-\lipsum[12-13]
+\lipsum[12]
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
