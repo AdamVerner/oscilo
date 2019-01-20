@@ -1,10 +1,14 @@
 FILENAME := Main
+CC := pdflatex -synctex=1 -interaction=nonstopmode
 
 example-show: $(FILENAME).pdf
 	xdg-open $(FILENAME).pdf
 
-$(FILENAME).pdf : template/SPSTemplate.cls $(FILENAME).tex
-	pdflatex -synctex=1 -interaction=nonstopmode $(FILENAME).tex
+$(FILENAME).pdf : template/SPSTemplate.cls $(FILENAME).tex 
+	$(CC) $(FILENAME).tex
+	# biber $(FILENAME)
+	$(CC) $(FILENAME).tex
+	$(CC) $(FILENAME).tex
 
 .PHONY: regen
 
@@ -15,4 +19,6 @@ regen:
 .PHONY: clean
 
 clean:
-	rm -f *.aux *.log *.out *.pdf *.synctex.gz *.dvi *.toc
+	# idgaf delete everything
+	rm -f *.aux *.log *.out *.pdf *.synctex.gz *.dvi *.toc *.run.xml  *.bcf *.blg *.bbl *.lot *.lof
+

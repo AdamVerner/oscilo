@@ -1,6 +1,11 @@
-\documentclass[12pt,a4paper]{template/SPSTemplate} % Default font size is 12pt, it can be changed here
+\documentclass[oneside,12pt,a4paper]{template/SPSTemplate} % Default font size is 12pt, it can be changed here
 
 \usepackage{graphicx}
+\usepackage{amsmath} % mathematical fractions
+\usepackage{lipsum}
+\usepackage{float}
+\usepackage{biblatex}  %  sudo apt-get install texlive-bibtex-extra
+\addbibresource{zdroje.bib}
 \graphicspath{{./template/}{./Pictures/}}
 
 \creator{VERNER Adam}
@@ -19,6 +24,45 @@ Také bych chtěl poděkovat svému otci, který mě již v útlém věku zainte
 
 \begin{document}
 	\makebeginning
+
+	\addcontentsline{toc}{chapter}{Obsah}
+	\tableofcontents
+
+	
+	\chapter{Úvod}
+	
+	\chapter{Analogově digitální převodníky}
+	\section{Vzorkování}
+	Ve zpracování signálu se vzorkováním myslí převod časově spojitého signálu do oblasti diskrétního
+	času. "Odebírání vzorků" může být provedeno Vzorkování může být vyjádřeno buďto jako frekvence $ f_{vz} $ nebo jako perioda $ T_{vz} $.
+	Závislost frekvence na periodě vzorkování je vyjádřena v následující rovnici:
+	
+	\begin{equation}
+	f_{vz} = \frac{1}{T_{vz}}
+	\end{equation}
+
+	
+	\subsection{Aliasing}
+	Vycházející z anglického slova \textit{alias}, znamenající: falešné jméno, pseudonym, "jinak zvaný." 
+	
+
+\textit{„Přesná rekonstrukce spojitého, frekvenčně omezeného signálu z jeho vzorků je možná tehdy, pokud byla vzorkovací frekvence vyšší než dvojnásobek nejvyšší harmonické složky vzorkovaného signálu.“}\cite{sampling_nyquist}
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth,keepaspectratio]{AliasingSines.eps}
+		\caption{Červená - vzorkovaný signál. Modrá - rekonstruovaný signál}
+		\label{img:aliasing}
+	\end{figure}
+	
+	
+	\appendix
+	
+	\printbibliography
+	
+	\listoffigures
+	\listoftables
+	
 
 \end{document}
 
