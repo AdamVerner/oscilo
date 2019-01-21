@@ -25,7 +25,7 @@
 \usage{Teaching purposes in the field of mechatronics, programming and digital signal processing}
 \abstrakten{This work is focused on development of device used to digitally process an analogue signal}
 \keywords{Oscilloscope, SystenVerilog, FPGA, USB, ADC, Python, GTK, Altera}
-\podekovani{Děkuji vedoucímu práce za nulovou důvěru v mojí schopnost řádného dokončení projektu, která mě motivovala udělat něco víc, než všichni očekávají.\\n
+\podekovani{Děkuji vedoucímu práce za nulovou důvěru v mojí schopnost řádného dokončení projektu, která mě motivovala udělat něco víc, než všichni očekávají.\\
 Také bych chtěl poděkovat svému otci, který mě již v útlém věku zainteresoval do digitálního světa, tím, že mě nechal rozbíjet vyřazené počítače.}
 
 \newcommand\T{\rule{0pt}{2.6ex}}       % Top strut
@@ -46,6 +46,37 @@ Také bych chtěl poděkovat svému otci, který mě již v útlém věku zainte
 		\section{za použití aktivních součástek}
 	
 		\section{Digitalizace spojitých signálů}
+		
+			\subsection{Vzorkování}
+		Ve zpracování signálu se vzorkováním myslí převod časově spojitého signálu do oblasti času diskrétního. 
+		Signál diskrétní v čase nemůže být, narozdní od spojitého, vyjádřen jako funkce, ale je vyjádřen jako posloupnost.
+		Diskrétní signál může vzniknout dvěma způsoby:
+		\begin{itemize}
+			\item získáním hodnot spojitého signálu při konstantním, nebo proměnlivém času. \cite{discretization_oppenheim}
+			\item pozorováním procesu založeném na diskrétním čase, např.: sledováním extrémních hodnot.
+		\end{itemize}
+		
+		
+		Rychlost vzorkování může být vyjádřena buď jako frekvence $ f_{vz} $ nebo jako perioda $ T_{vz} $.
+		Závislost frekvence na periodě vzorkování je vyjádřena v následující rovnici:
+		
+		\begin{equation}
+		f_{vz} = \frac{1}{T_{vz}}
+		\end{equation}
+
+	
+		\subsubsection{Aliasing}
+		Vycházející z anglického slova \textit{alias}, znamenající: falešné jméno, pseudonym, "jinak zvaný." 
+	
+
+		\textit{„Přesná rekonstrukce spojitého, frekvenčně omezeného signálu z jeho vzorků je možná tehdy, pokud byla vzorkovací frekvence vyšší než dvojnásobek nejvyšší harmonické složky vzorkovaného signálu.“}\cite{sampling_nyquist}
+	
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=\textwidth,keepaspectratio]{AliasingSines.eps}
+			\caption{Červená - vzorkovaný signál. Modrá - rekonstruovaný signál}
+			\label{img:aliasing}
+		\end{figure}
 	
 	\chapter{Číslicové Zpracování signálu}
 
@@ -68,36 +99,7 @@ Také bych chtěl poděkovat svému otci, který mě již v útlém věku zainte
 	
 	
 	
-	\section{Vzorkování}
-	Ve zpracování signálu se vzorkováním myslí převod časově spojitého signálu do oblasti času diskrétního. 
-	Signál diskrétní v čase nemůže být, narozdní od spojitého, vyjádřen jako funkce, ale je vyjádřen jako posloupnost.
-	Diskrétní signál může vzniknout dvěma způsoby:
-	\begin{itemize}
-		\item získáním hodnot spojitého signálu při konstantním, nebo proměnlivém času. \cite{discretization_oppenheim}
-		\item pozorováním procesu založeném na diskrétním čase, např.: sledováním extrémních hodnot.
-	\end{itemize}
-	
-	
-	Rychlost vzorkování může být vyjádřena buď jako frekvence $ f_{vz} $ nebo jako perioda $ T_{vz} $.
-	Závislost frekvence na periodě vzorkování je vyjádřena v následující rovnici:
-	
-	\begin{equation}
-	f_{vz} = \frac{1}{T_{vz}}
-	\end{equation}
 
-	
-	\subsection{Aliasing}
-	Vycházející z anglického slova \textit{alias}, znamenající: falešné jméno, pseudonym, "jinak zvaný." 
-	
-
-\textit{„Přesná rekonstrukce spojitého, frekvenčně omezeného signálu z jeho vzorků je možná tehdy, pokud byla vzorkovací frekvence vyšší než dvojnásobek nejvyšší harmonické složky vzorkovaného signálu.“}\cite{sampling_nyquist}
-	
-	\begin{figure}[H]
-		\centering
-		\includegraphics[width=\textwidth,keepaspectratio]{AliasingSines.eps}
-		\caption{Červená - vzorkovaný signál. Modrá - rekonstruovaný signál}
-		\label{img:aliasing}
-	\end{figure}
 	
 	\section{Programovatelné logické obvody}
 
