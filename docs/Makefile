@@ -6,7 +6,7 @@ example-show: $(FILENAME).pdf
 
 $(FILENAME).pdf : template/SPSTemplate.cls $(FILENAME).tex 
 	$(CC) $(FILENAME).tex
-	# biber $(FILENAME)
+	biber $(FILENAME)
 	$(CC) $(FILENAME).tex
 	$(CC) $(FILENAME).tex
 
