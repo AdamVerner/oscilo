@@ -5,7 +5,20 @@
 
 \usetheme{Blacko}
 
-\usepackage{etoc}  % for subsection tocs
+\setcounter{tocdepth}{2}  % hide subsubsections and lower
+
+\setbeamercolor{structure}{bg=black, fg=gray}
+\AtBeginSection[]
+  {
+    \ifnum \value{framenumber}>1
+    \setbeamercolor{structure}{bg=black, fg=red}
+      \begin{frame}
+      \frametitle{Plan}
+      \tableofcontents[currentsection]
+      \end{frame}
+    \else
+    \fi
+  }
 
 \title{\texttt{\LARGE Dvoukanálový USB osciloskop}}
 \subtitle{ Obhajoba DMP }
@@ -24,8 +37,6 @@
 
 \section{Cože to mám vlastně dělat}
 
-% \etocsettocstyle{}{}    %% Removes title from \localtableofcontents
-\localtableofcontents
 
 \subsection{Hardware}
 \subsection{Firmware}
@@ -35,16 +46,15 @@
 
 
 \section{Co už jsem všechno udělal}
-\localtableofcontents
 \subsection{Výběr HW}
 \subsection{Návrh systému běžícím na FPGA a jeho implementace}
 \subsection{Návrh řídící aplikace a její implementace}
 \subsection{Textová část}
-\subsubsecton{LaTeX}
+\subsubsection{LaTeX}
 
 
 \section{Co budu dělat dál}
-\localtableofcontents
+
 \subsection{Moduly do FPGA}
 \subsection{Ladění}
 \subsection{PC applikace(možná jí celou přepíšu)}

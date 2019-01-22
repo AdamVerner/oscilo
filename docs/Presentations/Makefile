@@ -1,6 +1,6 @@
 FILENAME := Obhajoba1
 CC := pdflatex -synctex=1 -interaction=nonstopmode
-DEPS := beamerthemeBlacko.sty kmbeamer_common.sty beamercolorthemeBlacko.sty
+DEPS := beamerthemeBlacko.sty beamercolorthemeBlacko.sty
 
 example-show: $(FILENAME).pdf
 	xdg-open $(FILENAME).pdf
