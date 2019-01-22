@@ -5,6 +5,8 @@
 
 \usetheme{Blacko}
 
+\usepackage{etoc}  % for subsection tocs
+
 \title{\texttt{\LARGE Dvoukanálový USB osciloskop}}
 \subtitle{ Obhajoba DMP }
 \author{ Adam Verner \footnote{\texttt{vernead15@sps-prosek.cz}}}
@@ -20,20 +22,37 @@
   \tableofcontents
 \end{frame}
 
-\section{představení}
+\section{Cože to mám vlastně dělat}
 
-\begin{frame}{Cože to vlastně mám dělat?}
-  úkoly
+% \etocsettocstyle{}{}    %% Removes title from \localtableofcontents
+\localtableofcontents
 
-  \begin{itemize}
-  \item Hardware
-  \item Firmware
-  \item Software
-  \item Obhajoba
-  \item Rešerše
-  \item Dokumentace
-  \end{itemize}
+\subsection{Hardware}
+\subsection{Firmware}
+\subsection{Software}
+\subsection{Textová část}
+\subsection{Obhajoba}  % not so sure about this section
 
+
+\section{Co už jsem všechno udělal}
+\localtableofcontents
+\subsection{Výběr HW}
+\subsection{Návrh systému běžícím na FPGA a jeho implementace}
+\subsection{Návrh řídící aplikace a její implementace}
+\subsection{Textová část}
+\subsubsecton{LaTeX}
+
+
+\section{Co budu dělat dál}
+\localtableofcontents
+\subsection{Moduly do FPGA}
+\subsection{Ladění}
+\subsection{PC applikace(možná jí celou přepíšu)}
+\subsection{Textová část}
+
+
+
+\begin{frame}{Co plánuji dělat dál}
 \end{frame}
 
 
