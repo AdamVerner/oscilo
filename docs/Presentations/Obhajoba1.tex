@@ -2,6 +2,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[czech]{babel}
+\usepackage[normalem]{ulem}
 
 \usetheme{Blacko}
 
@@ -105,19 +106,52 @@
 	\end{frame}
 		
 	
-\section{Co už hotové}
-	\begin{frame}{Výběr HW}
-		\begin{itemize}
-			\item seznámit se s trhem a vybrat nejvhodnější fpga a ADC
-			\item ADC 
-			\item FPGA
-			\end{itemize}
-		\end{frame}
-	\subsection{Návrh systému běžícím na FPGA a jeho implementace}
-	\subsection{Návrh řídící aplikace a její implementace}
-	\subsection{Textová část}
-	\subsubsection{LaTeX}
+\section{Co už je hotové}
 
+	\subsection{Hardware}
+	\begin{frame}{Hardware}
+		\begin{itemize}
+			\item Vybrat ADC
+				\begin{itemize}
+					\item 65 MSPS
+					\item 12 bit
+					\item 1 ch.
+					\item $ \pm 100V_{pp} $
+				\end{itemize}
+			\item Vybrat FPGA
+				\begin{itemize}
+					\item Cyclone IV E EP4CE6E22C8
+					\item 144 QFP
+					\item 200Mhz
+					\item 6272 logic-elements
+					\item 276,480 mem bits + 64Mb on-board
+				\end{itemize}			
+			\item \sout{externí RAM}
+			\item Koupit "nějaký"\ konektory
+		\end{itemize}
+	\end{frame}
+	
+	\subsection{Firmware}
+		\begin{frame}{Firmware}
+			\includegraphics[width=\paperwidth]{rtl_fake.png}
+		\end{frame}
+	\subsection{Návrh řídící aplikace a její implementace}
+		\begin{frame}{Software}
+			\includegraphics[width=\paperwidth]{oscilo_fake.png}
+		\end{frame}
+		\begin{frame}{Software}
+			\includegraphics[width=\paperwidth]{profile_fake.png}
+		\end{frame}
+	\subsection{Textová část}
+		\begin{frame}{Textová část}
+			\begin{itemize}
+				\item \LaTeX\ template pro hlavní textovou část
+				\item \LaTeX\  pro tuhle prezentaci
+				\item Hrubá struktura kapitol
+				\item Úvod a pár kapitolek
+				\item Do neděle spousta času
+			\end{itemize}		
+		\end{frame}
 
 \section{Co budu dělat dál}
 
@@ -125,9 +159,9 @@
 \subsection{Ladění}
 \subsection{PC applikace(možná jí celou přepíšu)}
 \subsection{Textová část}
-\begin{frame}{Výběr HW}
+\begin{frame}{}
 	\begin{itemize}
-		\item Všechno
+		\item Všechno co nebylo v předchozí části :)
 		\end{itemize}
 	\end{frame}
 
