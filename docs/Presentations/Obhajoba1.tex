@@ -7,16 +7,35 @@
 
 \setcounter{tocdepth}{2}  % hide subsubsections and lower
 
-\AtBeginSection[]
-  {
-    \ifnum \value{framenumber}>1
-      \begin{frame}
-      \frametitle{Plan}
-      \tableofcontents[currentsection]
-      \end{frame}
-    \else
-    \fi
-  }
+\AtBeginSection[]{
+	\ifnum \value{framenumber}>1  % don't show on first page
+		\begin{frame}
+			\frametitle{Plan}
+			\tableofcontents[currentsection]
+		\end{frame}
+    \else\fi
+
+	\begin{frame}
+	\vfill
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		\usebeamerfont{title}\insertsectionhead\par%
+	\end{beamercolorbox}
+	\vfill
+	\end{frame}	    
+}
+
+\AtBeginSection[]{
+	\begin{frame}
+	\vfill
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		\usebeamerfont{title}\insertsectionhead\par%
+	\end{beamercolorbox}
+	\vfill
+	\end{frame}	    
+}
+  
+\setbeamercovered{%
+  again covered={\opaqueness<1->{15}}}
 
 \title{\texttt{\LARGE Dvoukanálový USB osciloskop}}
 \subtitle{ Obhajoba DMP }
@@ -26,29 +45,78 @@
 
 \begin{frame}
   \maketitle \\
-  \textit{testtext}
 \end{frame}
 
 \begin{frame}{Co nás v prezentaci čeká?}
   \tableofcontents
 \end{frame}
 
-\section{Cože to mám vlastně dělat}
+\section{Cože to má vlastně být}
 
 
-\subsection{Hardware}
-\subsection{Firmware}
-\subsection{Software}
-\subsection{Textová část}
-\subsection{Obhajoba}  % not so sure about this section
-
-
-\section{Co už jsem všechno udělal}
-\subsection{Výběr HW}
-\subsection{Návrh systému běžícím na FPGA a jeho implementace}
-\subsection{Návrh řídící aplikace a její implementace}
-\subsection{Textová část}
-\subsubsection{LaTeX}
+	\subsection{Hardware}
+	\begin{frame}{Hardware}
+		\begin{itemize}
+			\item Stanovit parametry
+			\item Mechanická konstrukce
+			\item plošňák
+			\item Front-end
+			\item ADC
+			\item FPGA
+			\item RAM?
+		\end{itemize}
+	\end{frame}
+	
+	\subsection{Firmware}
+	\begin{frame}{Firmware}
+		\begin{itemize}
+			\item Sběr vzorků
+			\item Triggerování
+			\item ukládání
+			\item konfigurace
+			\item přenos do PC
+		\end{itemize}
+	\end{frame}
+	
+	\subsection{Software}
+	\begin{frame}{Software}
+		\begin{itemize}
+			\item Zobrazování průběhů
+			\item Export dat
+			\item konfigurace zařízení
+			\item analýza dat - filtry, transformace, operace....
+			\item skryptovací "sandbox"\ pro analýzu dat.
+		\end{itemize}
+	\end{frame}
+	\subsection{Textová část}
+	\begin{frame}{Textová část}
+		\begin{itemize}
+			\item Úvod
+			\item Závěr
+			\item Rešerše
+			\begin{itemize}  % viz zadání
+				\item zpracování signálu
+				\item části digitálního osciloskopu
+				\item A/D převodníky
+			\end{itemize}
+			\item Závěr z testování
+			\item Kompletace
+		\end{itemize}
+	\end{frame}
+		
+	
+\section{Co už hotové}
+	\begin{frame}{Výběr HW}
+		\begin{itemize}
+			\item seznámit se s trhem a vybrat nejvhodnější fpga a ADC
+			\item ADC 
+			\item FPGA
+			\end{itemize}
+		\end{frame}
+	\subsection{Návrh systému běžícím na FPGA a jeho implementace}
+	\subsection{Návrh řídící aplikace a její implementace}
+	\subsection{Textová část}
+	\subsubsection{LaTeX}
 
 
 \section{Co budu dělat dál}
@@ -57,11 +125,14 @@
 \subsection{Ladění}
 \subsection{PC applikace(možná jí celou přepíšu)}
 \subsection{Textová část}
+\begin{frame}{Výběr HW}
+	\begin{itemize}
+		\item Všechno
+		\end{itemize}
+	\end{frame}
 
 
 
-\begin{frame}{Co plánuji dělat dál}
-\end{frame}
 
 
 \end{document}
