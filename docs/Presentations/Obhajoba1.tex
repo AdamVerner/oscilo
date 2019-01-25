@@ -60,7 +60,7 @@
 		\begin{itemize}
 			\item Stanovit parametry
 			\item Mechanická konstrukce
-			\item plošňák
+			\item Plošňák
 			\item Front-end
 			\item ADC
 			\item FPGA
@@ -73,9 +73,9 @@
 		\begin{itemize}
 			\item Sběr vzorků
 			\item Triggerování
-			\item ukládání
-			\item konfigurace
-			\item přenos do PC
+			\item Ukládání
+			\item Konfigurace
+			\item Přenos do PC
 		\end{itemize}
 	\end{frame}
 	
@@ -84,9 +84,8 @@
 		\begin{itemize}
 			\item Zobrazování průběhů
 			\item Export dat
-			\item konfigurace zařízení
-			\item analýza dat - filtry, transformace, operace....
-			\item skryptovací "sandbox"\ pro analýzu dat.
+			\item Konfigurace zařízení
+			\item Analýza dat - filtry, transformace, operace....
 		\end{itemize}
 	\end{frame}
 	\subsection{Textová část}
@@ -96,8 +95,8 @@
 			\item Závěr
 			\item Rešerše
 			\begin{itemize}  % viz zadání
-				\item zpracování signálu
-				\item části digitálního osciloskopu
+				\item Zpracování signálu
+				\item Části digitálního osciloskopu
 				\item A/D převodníky
 			\end{itemize}
 			\item Závěr z testování
@@ -108,35 +107,72 @@
 	
 \section{Co už je hotové}
 
+		\begin{frame}{Hardware}
+		\begin{itemize}
+			\item Vybrat ADC
+				\begin{itemize}
+					\item min 12 bit 
+					\item min 10MSPS
+				\end{itemize}
+			\item[] \ \ \\
+				\begin{itemize}
+					\item[]
+					\item[] 
+					\item[]
+					\item[]
+				\end{itemize}			
+			\item[]
+			\item[]
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{ADC}
+		\includegraphics[width=\paperwidth]{adc_board.jpg}
+	\end{frame}
+
 	\subsection{Hardware}
 	\begin{frame}{Hardware}
 		\begin{itemize}
 			\item Vybrat ADC
 				\begin{itemize}
-					\item 65 MSPS
-					\item 12 bit
-					\item 1 ch.
-					\item $ \pm 100V_{pp} $
+					\item min 12 bit 
+					\item min 10MSPS
 				\end{itemize}
 			\item Vybrat FPGA
 				\begin{itemize}
 					\item Cyclone IV E EP4CE6E22C8
-					\item 144 QFP
 					\item 200Mhz
 					\item 6272 logic-elements
 					\item 276,480 mem bits + 64Mb on-board
 				\end{itemize}			
-			\item \sout{externí RAM}
-			\item Koupit "nějaký"\ konektory
+			\item[]
+			\item[]
 		\end{itemize}
 	\end{frame}
 
-	\begin{frame}{ADC}
-		\includegraphics[width=\paperwidth]{adc_board.jpg}
+	\begin{frame}{FPGA DEV}
+		\includegraphics[width=\paperwidth]{ZRtech_board.jpg}
 	\end{frame}
 	
-		\begin{frame}{FPGA DEV}
-		\includegraphics[width=\paperwidth]{ZRtech_board.jpg}
+	\subsection{Hardware}
+	\begin{frame}{Hardware}
+		\begin{itemize}
+			\item Vybrat ADC
+				\begin{itemize}
+					\item min 12 bit 
+					\item min 10MSPS
+				\end{itemize}
+			\item Vybrat FPGA
+				\begin{itemize}
+					\item Cyclone IV E EP4CE6E22C8
+					\item 200Mhz
+					\item 6272 logic-elements
+					\item 276,480 mem bits + 64Mb on-board
+					\item on-board usb-uart
+				\end{itemize}			
+			\item \sout{externí RAM} \pause
+			\item propojení desek
+		\end{itemize}
 	\end{frame}
 	
 	
@@ -166,7 +202,7 @@
 
 \subsection{Moduly do FPGA}
 \subsection{Ladění}
-\subsection{PC applikace(možná jí celou přepíšu)}
+\subsection{PC applikace}
 \subsection{Textová část}
 \begin{frame}{}
 	\begin{itemize}
