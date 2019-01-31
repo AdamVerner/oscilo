@@ -40,8 +40,26 @@ Také bych chtěl poděkovat svému otci, který mě již v útlém věku zainte
 	\chapter{Úvod}
 	
 	\chapter{Analogové zpracování signálů}
+		Analogové zpracování signálů má mnoho výhod i nevýhod oprotoi tomu digitálnímu. Jednou z hlavních výhod je možnost zpracování daleko širšího pásma oproti digitálnímu zpracován. 
 
-		\section{za použití pasivních součástek}		
+		Nejrychlejší transistor od firmy IBM je schopen spolehlivě pracovat až do frekvence 210 GHz, zatímco nejrychlejší ADC umí vstup pouze do 8Ghz se vzorkováním 6.4 Ghz a rozlišením 12 bitů \cite{(http://www.ti.com/product/adc12dl3200).}
+
+		Avšak ve finále se používá kombinace obou metod, za pomocí analogových obvodů se signál před-připraví(před-zpracuje), tak aby se co dal nejlépe zaznamenávat pomocí ADC a poté složitější operace a analýza se provedou ve světě digitálním.
+
+		\section{za použití pasivních součástek}
+			Jak již název vypovídá, pomocí pasivních součástek se dá ze signálu pouze "ubírat." To znamená, že ze samotných pasivních součástek můžeme stavět pouze filtry, jsou ještě další aplikace, ale tam se bez křemíku neboejdeme.
+			Pasivní součástky jsou Rezistory, kondenzátory a indukčnosti.
+
+			V případě stejnosměrného signálu(stailního) má na výstup vliv pouze rezistor, kondenzátor se chová jako otevřený spoj a indukčnost se chová opačně, tudíž kontakty spouje.
+			U AC signálu, už to tak jednoduhé není. Kondenzátory zadržují náboj, špičky vyhlazují, fázově všechno posouvají jedním směrem, zatímco cívky dělají skoro přesný opak. Naštěstí pro nás, všechno se chová podle jistých pravidel.
+
+			\begin{itemize}
+			
+				\item děliče napětí
+				\item filtry {\color{red} doplnit druhy}
+
+			\emd{itemize}
+			
 		
 		\section{za použití aktivních součástek}
 	
