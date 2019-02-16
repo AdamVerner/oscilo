@@ -1,18 +1,18 @@
-FILENAME := Obhajoba1
+FILENAME := Obhajoba2
 CC := pdflatex -synctex=1 -interaction=nonstopmode
 DEPS := beamerthemeBlacko.sty beamercolorthemeBlacko.sty
 
-example-show: $(FILENAME).pdf
-	xdg-open $(FILENAME).pdf
-
 $(FILENAME).pdf : $(DEPS) $(FILENAME).tex 
 	$(CC) $(FILENAME).tex
+
+show: $(FILENAME).pdf
+	xdg-open $(FILENAME).pdf
 
 .PHONY: regen
 
 regen:
 	rm -f $(FILENAME).pdf
-	make example-show
+	make
 
 .PHONY: clean
 
