@@ -6,7 +6,7 @@ dummy fpga for testing and development of user app
 always replies with same waveforms and so on....
 """
 
-import numpy as np
+from numpy import arange, sin, pi
 from time import sleep
 from multiprocessing import Process
 
@@ -55,9 +55,9 @@ class Device(object):
     def get_samples(self, samples=1024):
         self.state = self.STATE_SAMPLE_MEM_READER
 
-        x = np.arange(samples)  # the points on the x axis for plotting
+        x = arange(samples)  # the points on the x axis for plotting
         # compute the value (amplitude) of the sin wave at the for each sample
-        y = [np.sin(2*np.pi*self.sample_speed * (i/samples)) for i in x]
+        y = [sin(2*pi*self.sample_speed * (i/samples)) for i in x]
 
         # return the state of the device back to init
         self._state = self.STATE_INIT
