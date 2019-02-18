@@ -74,11 +74,13 @@ module sampler(
             case (sampler_state)
 
                 ST_IDLE:
+                begin
+                    done = 0;
                     if (activate)
                         sampler_state = ST_SETUP;
+                 end
 
                 ST_SETUP: begin
-                    done = 0;
                     activate_adc_clk = 1;
                     activate_mem_clk = 1;
                     mem_we = 1;  // enable writing into memory
@@ -116,7 +118,9 @@ module sampler(
                         activate_mem_clk = 0;
                         mem_we = 0;  // enable writing into memory
                         done = 1;
-                        sampler_state = ST_IDLE;
+
+                        if (~activate)
+                            sampler_state = ST_IDLE;
                     end
 
                 default:

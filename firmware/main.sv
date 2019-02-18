@@ -100,8 +100,10 @@ module main(
     );
     // sampler_instance stop
 
+
     assign LED_GREEN = sampler_activate;
     assign LED_RED = sampler_done;
+
 
     // sample_reader_instance start
     wire       sample_reader_activate, sample_reader_done;

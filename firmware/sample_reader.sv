@@ -33,10 +33,10 @@ module sample_reader(
             case (reader_state)
                 ST_IDLE:
                 begin
+                    done = 0;
                     if (activate)
                     begin
                         reader_state = ST_FETCH;
-                        done = 0;
                         mem_addr = 0;
                         mem_oe = 1;
                     end
@@ -70,10 +70,11 @@ module sample_reader(
                 end
                 ST_DONE:
                 begin
-                    reader_state = ST_IDLE;
                     done = 1;
                     tx_start = 0;
                     mem_oe = 0;
+                    if (~activate & ~tx_active)
+                        reader_state = ST_IDLE;
 
                 end
                 default:
