@@ -107,7 +107,7 @@ module main(
     wire       sample_reader_activate, sample_reader_done;
     wire [7:0] sampler_reader_tx_data;
     wire       sampler_reader_tx_start;
-    sampler sampler_instace(
+    sample_reader sample_reader_instace(
         .clk_50mhz(CLK),
         .reset(KEY4),
         .activate(sample_reader_activate),

@@ -1,7 +1,7 @@
 /*
 */
 
-module sampler(
+module sample_reader(
 
     input        clk_50mhz,
                  reset,
@@ -23,22 +23,19 @@ module sampler(
 
     parameter ST_IDLE = 0;
     parameter ST_FETCH = 1;
-    parameter ST_TX = 2;
-    parameter ST_DONE = 3;
+	 parameter ST_WAIT = 2;
+    parameter ST_TX = 3;
+    parameter ST_DONE = 4;
 
 
-    always @(posedge clk_50mhz)begin
-
-    end
-
-    always @(posedge std_clk)
+    always @(posedge clk_50mhz)
         begin
-            case (sampler_state)
+            case (reader_state)
                 ST_IDLE:
                 begin
                     if (activate)
                     begin
-                        sampler_state = ST_FETCH;
+                        reader_state = ST_FETCH;
                         mem_addr = 0;
                         mem_oe = 1;
                     end
@@ -49,11 +46,11 @@ module sampler(
                     mem_addr += 1;
 
                     if(mem_addr >= 255)
-                        sampler_state = ST_DONE;
+                        reader_state = ST_DONE;
                     else
                     begin
                         tx_start = 1;
-                        stampler_state = ST_TX;
+                        reader_state = ST_TX;
                     end
                 end
                 ST_TX:
@@ -61,25 +58,25 @@ module sampler(
                     if(~tx_active)
                     begin
                         tx_start = 0;
-                        sampler_state = ST_WAIT;
+                        reader_state = ST_WAIT;
                     end
                 end
                 ST_WAIT:
                 begin
                     sleep_counter = sleep_counter + 1;
                     if(sleep_counter >= 5000000) // wait 0.1 sec
-                        state = ST_FETCH;
+                        reader_state = ST_FETCH;
                 end
                 ST_DONE:
                 begin
-                    sampler_state = ST_IDLE;
+                    reader_state = ST_IDLE;
                     tx_start = 0;
                     mem_oe = 0;
 
                 end
 
                 default:
-                    sampler_state = ST_IDLE;
+                    reader_state = ST_IDLE;
             endcase
         end
 
