@@ -23,6 +23,16 @@ module sampler(
     output       mem_we
 );
 
+    wire std_clk;
+    wire [15:0] clkcnt = 0;
+
+    assign std_clk = clk_cnt[15];
+
+    always @(posedge clk_50mhz) begin
+        clkcnt += 1;
+    end
+
+
     parameter SAMPLE_DEPTH = 8; // 256 samples
 
     wire [SAMPLE_DEPTH-1:0] samples_trigger_offset;
@@ -42,8 +52,8 @@ module sampler(
 
 
         // activate output adc only when activated
-    assign adc_clk = clk_50mhz && activate_adc_clk;
-    assign mem_clk = clk_50mhz && activate_mem_clk;
+    assign adc_clk = std_clk && activate_adc_clk;
+    assign mem_clk = std_clk && activate_mem_clk;
 
 
         // TRIGGER LOGIC BEGIN
@@ -59,7 +69,7 @@ module sampler(
 
         /* TODO add clk_divided*/
 
-    always @(posedge clk_50mhz)
+    always @(posedge std_clk)
         begin
             case (sampler_state)
 
