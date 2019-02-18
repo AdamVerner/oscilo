@@ -19,7 +19,7 @@ module sample_reader(
 );
 
     reg [22:0] sleep_counter;  // max = 8388607
-    wire [3:0]              reader_state;
+    wire [3:0] reader_state;
 
     parameter ST_IDLE = 0;
     parameter ST_FETCH = 1;
@@ -36,6 +36,7 @@ module sample_reader(
                     if (activate)
                     begin
                         reader_state = ST_FETCH;
+                        done = 0;
                         mem_addr = 0;
                         mem_oe = 1;
                     end
@@ -70,11 +71,11 @@ module sample_reader(
                 ST_DONE:
                 begin
                     reader_state = ST_IDLE;
+                    done = 1;
                     tx_start = 0;
                     mem_oe = 0;
 
                 end
-
                 default:
                     reader_state = ST_IDLE;
             endcase
