@@ -105,6 +105,21 @@ module main(
 
     // sample_reader_instance start
     wire       sample_reader_activate, sample_reader_done;
+    wire [7:0] sampler_reader_tx_data;
+    wire       sampler_reader_tx_start;
+    sampler sampler_instace(
+        .clk_50mhz(CLK),
+        .reset(KEY4),
+        .activate(sample_reader_activate),
+        .done(sample_reader_done),
+        .tx_active(tx_active),
+        .tx_data(sampler_reader_tx_data),
+        .tx_start(sampler_reader_tx_start),
+        .mem_data(sm_data_out),
+        .mem_addr(sm_addr_out),
+        .mem_oe(sm_oe)
+    );
+
     // sample_reader_instance stop
 
 
@@ -153,6 +168,9 @@ module main(
             end else if (reply_cnt_activate) begin
                 tx_data = reply_cnt_tx_data;
                 tx_start = reply_cnt_tx_start;
+            end else if (sample_reader_activate) begin
+                tx_data = sampler_reader_tx_data;
+                tx_start = sampler_reader_tx_start;
             end else
                 tx_start = 0;
         end

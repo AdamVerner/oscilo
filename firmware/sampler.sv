@@ -24,12 +24,12 @@ module sampler(
 );
 
     wire std_clk;
-    wire [15:0] clkcnt = 0;
+    reg [15:0] clk_cnt = 0;
 
     assign std_clk = clk_cnt[15];
 
     always @(posedge clk_50mhz) begin
-        clkcnt += 1;
+        clk_cnt += 1;
     end
 
 
