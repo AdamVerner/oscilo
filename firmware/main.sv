@@ -6,10 +6,10 @@ module main(
     output       TXD,
 
     input        KEY4,  // RESET
-    input        KEY4,  // RESET
 
     output       DS_A, DS_B, DS_C, DS_D, DS_E, DS_F, DS_G,
-    output       DSEN_1, DSEN_2, DSEN_3, DSEN_4 // active LOW
+    output       DSEN_1, DSEN_2, DSEN_3, DSEN_4, // active LOW
+    output       LED_GREEN, LED_RED
     );
 
     wire [7:0] rx_data;
@@ -100,6 +100,8 @@ module main(
     );
     // sampler_instance stop
 
+    assign LED_GREEN = sampler_activate;
+    assign LED_RED = sampler_done;
 
     // sample_reader_instance start
     wire       sample_reader_activate, sample_reader_done;
@@ -201,6 +203,8 @@ module main(
                 end
             endcase
 
+            if (sampler_activate && sampler_done)
+                state = ST_READY;
 
             if (replayer_activate && replayer_done)
                 state = ST_READY;
