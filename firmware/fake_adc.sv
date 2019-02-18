@@ -5,7 +5,7 @@
 module fake_adc(
     input        clk,
     input        rst,
-    output [7:0] data_out
+    output [7:0] data_out = 0
     );
 
     always @(posedge clk)
@@ -13,7 +13,12 @@ module fake_adc(
             if (~rst)
                 data_out = 0;
             else
-                data_out += 1;
+                begin
+                    data_out += 1;
+                    if(data_out == 255)
+                        data_out = 0;
+                end
+
 
         end
 
