@@ -44,9 +44,8 @@ module sample_reader(
                 ST_FETCH:
                 begin
                     tx_data = mem_data;
-                    mem_addr += 1;
 
-                    if(mem_addr >= 255)
+                    if(mem_addr == 255)
                         reader_state = ST_DONE;
                     else
                     begin
@@ -60,6 +59,7 @@ module sample_reader(
                     begin
                         tx_start = 0;
                         reader_state = ST_WAIT;
+                        mem_addr += 1;
                     end
                 end
                 ST_WAIT:
