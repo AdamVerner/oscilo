@@ -57,6 +57,25 @@ class MainTest(unittest.TestCase):
 
         self.assertEqual(data, expected)
 
+    def test_sample_reader(self):
+
+        self.serial_device.write(b'\x22')  # start sample-reader
+
+        samples = self.serial_device.read(255)  # read all samples
+        print(samples)
+        self.assertEqual(len(samples), 255)
+
+    def test_mem_clear(self):
+        word = b'\x11'  # select a 1 byte word to test with
+
+        self.serial_device.write(b'\x23')  # enable mem_clear
+        self.serial_device.write(word)  # send word to set memmory to
+
+        self.serial_device.write(b'\x22')  # start sample-reader
+        samples = self.serial_device.read(255)  # read all samples
+        print(samples)
+        self.assertEqual(word * 255, samples)
+
 
 if __name__ == '__main__':
     test_loader = unittest.TestLoader()
