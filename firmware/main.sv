@@ -188,7 +188,7 @@ module main(
     // reply_cnt_instance stop
 
 
-    // UART_TX MANAGER START
+    // MEDIA MANAGER START
     always @(posedge CLK)
         begin
             if (replayer_activate) begin
@@ -200,23 +200,23 @@ module main(
             end else if (sample_reader_activate) begin
                 tx_data = sampler_reader_tx_data;
                 tx_start = sampler_reader_tx_start;
-                sm_addr_out = sample_reader_addr_out;
-                sm_oe = sample_reader_oe;
-            end else if (sampler_activate) begin
-                sm_data_in = sampler_data_in;
-                sm_addr_in = sampler_addr_in;
-                sm_we = sampler_we;
-                sm_clk = sampler_clk;
-            end else if (mem_clear_activate) begin
-                sm_data_in = mem_clear_data_in;
-                sm_addr_in = mem_clear_addr_in;
-                sm_we = mem_clear_we;
-                sm_clk = mem_clear_clk;
-
             end else
                 tx_start = 0;
         end
-    // UART_TX MANAGER START
+
+    assign sm_we =  (sampler_we  && sampler_activate) | (mem_clear_we  && mem_clear_activate);
+    assign sm_clk = (sampler_clk && sampler_activate) | (mem_clear_clk && mem_clear_activate);
+
+    assign sm_data_in = (sampler_data_in   & {8{sampler_activate}}) |
+                        (mem_clear_data_in & {8{mem_clear_activate}});
+
+    assign sm_addr_in = (sampler_addr_in   & {8{sampler_activate}}) |
+                        (mem_clear_addr_in & {8{mem_clear_activate}});
+
+    assign sm_addr_out = (sample_reader_addr_out & {8{sample_reader_activate}});
+
+    assign sm_oe =       (sample_reader_oe && sample_reader_activate);
+    // MEDIA MANAGER STOP
 
 
     // STATE_WATCHER states
