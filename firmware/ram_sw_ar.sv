@@ -18,7 +18,7 @@ module ram_sw_ar#(parameter DATA_WIDTH = 8,
 );
 
 
-    reg [DATA_WIDTH-1:0] mem [ADDR_WIDTH-1:0];
+    reg [DATA_WIDTH-1:0] Mem [0:(1<<ADDR_WIDTH)-1];
 
 
         /* Synchronous memmory write */
