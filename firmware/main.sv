@@ -77,10 +77,35 @@ module main(
     // sampling memmory end
 
 
+    // mem clearer start
+    wire       mem_clear_activate, mem_clear_done;
+    wire [7:0] mem_clear_data_in;
+    wire [7:0] mem_clear_addr_in;
+    wire       mem_clear_we;
+    wire       mem_clear_clk;
+    mem_clear mem_clear_instance(
+      .clk_50mhz(CLK),
+      .reset    (KEY4),
+      .activate (mem_clear_activate),
+      .done     (mem_clear_done),
+      .rx_data  (rx_data),
+      .rx_ready (rx_ready),
+      .mem_clk  (mem_clear_clk),
+      .mem_data (mem_clear_data_in),
+      .mem_addr (mem_clear_addr_in),
+      .mem_we   (mem_clear_we)
+    );
+    // mem clear stop
+
+
     // sampler_instance start
     wire       sampler_activate, sampler_done;
     wire [7:0] adc_data;
     wire       adc_clk;
+    wire [7:0] sampler_data_in;
+    wire [7:0] sampler_addr_in;
+    wire       sampler_we;
+    wire       sampler_clk;
     fake_adc fake_adc_instance(
         .clk     (adc_clk),
         .rst     (KEY4),
@@ -93,10 +118,10 @@ module main(
         .done     (sampler_done),
         .adc_clk  (adc_clk),
         .adc_data (adc_data),
-        .mem_data (sm_data_in),
-        .mem_addr (sm_addr_in),
-        .mem_we   (sm_we),
-        .mem_clk  (sm_clk)
+        .mem_data (sampler_data_in),
+        .mem_addr (sampler_addr_in),
+        .mem_we   (sampler_we),
+        .mem_clk  (sampler_clk)
     );
     // sampler_instance stop
 
@@ -109,6 +134,8 @@ module main(
     wire       sample_reader_activate, sample_reader_done;
     wire [7:0] sampler_reader_tx_data;
     wire       sampler_reader_tx_start;
+    wire [7:0] sample_reader_addr_out;
+    wire       sample_reader_oe;
     sample_reader sample_reader_instace(
         .clk_50mhz(CLK),
         .reset(KEY4),
@@ -118,8 +145,8 @@ module main(
         .tx_data(sampler_reader_tx_data),
         .tx_start(sampler_reader_tx_start),
         .mem_data(sm_data_out),
-        .mem_addr(sm_addr_out),
-        .mem_oe(sm_oe)
+        .mem_addr(sample_reader_addr_out),
+        .mem_oe(sample_reader_oe)
     );
 
     // sample_reader_instance stop
@@ -173,6 +200,19 @@ module main(
             end else if (sample_reader_activate) begin
                 tx_data = sampler_reader_tx_data;
                 tx_start = sampler_reader_tx_start;
+                sm_addr_out = sample_reader_addr_out;
+                sm_oe = sample_reader_oe;
+            end else if (sampler_activate) begin
+                sm_data_in = sampler_data_in;
+                sm_addr_in = sampler_addr_in;
+                sm_we = sampler_we;
+                sm_clk = sampler_clk;
+            end else if (mem_clear_activate) begin
+                sm_data_in = mem_clear_data_in;
+                sm_addr_in = mem_clear_addr_in;
+                sm_we = mem_clear_we;
+                sm_clk = mem_clear_clk;
+
             end else
                 tx_start = 0;
         end
@@ -184,6 +224,7 @@ module main(
     parameter ST_INIT = 8'h00;
     parameter ST_SAMPLER = 8'h21;
     parameter ST_SAMPLE_READ = 8'h22;
+    parameter ST_MEM_CLEAR = 8'h23;
     parameter ST_REPLAYER = 8'h71;
     parameter ST_REPLY_CNT = 8'h72;
 
@@ -206,6 +247,7 @@ module main(
                 ST_SAMPLE_READ: sample_reader_activate = 1;
                 ST_REPLAYER: replayer_activate = 1;
                 ST_REPLY_CNT: reply_cnt_activate = 1;
+                ST_MEM_CLEAR: mem_clear_activate = 1;
 
                 ST_INIT:
                     if(rx_ready)
@@ -217,6 +259,7 @@ module main(
                     sample_reader_activate = 0;
                     replayer_activate = 0;
                     reply_cnt_activate = 0;
+                    mem_clear_activate = 0;
 
                     if(~rx_ready && ~tx_active)
                     state = ST_INIT;
@@ -235,11 +278,8 @@ module main(
             if (reply_cnt_activate && reply_cnt_done)
                 state = ST_READY;
 
+            if (mem_clear_activate && mem_clear_done)
+                state = ST_READY;
         end
 
 endmodule
-
-
-
-
-
