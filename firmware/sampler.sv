@@ -7,7 +7,6 @@
 */
 
 module sampler(
-
     input        clk_50mhz,
                  reset,
 
@@ -20,8 +19,11 @@ module sampler(
     output       mem_clk,
     output [7:0] mem_data,
     output [7:0] mem_addr,
-    output       mem_we
-);
+    output       mem_we,
+    output [SAMPLE_DEPTH-1:0] offset
+    );
+
+    parameter SAMPLE_DEPTH = 8; // 256 samples
 
     wire std_clk;
     reg [15:0] clk_cnt = 0;
@@ -33,9 +35,6 @@ module sampler(
     end
 
 
-    parameter SAMPLE_DEPTH = 8; // 256 samples
-
-    wire [SAMPLE_DEPTH-1:0] samples_trigger_offset;
     wire [SAMPLE_DEPTH-1:0] remaining_samples;
     wire                    activate_adc_clk;
     wire                    activate_mem_clk;
@@ -97,7 +96,7 @@ module sampler(
                     if (trig)
                         begin
                             sampler_state = ST_POST_TRIG;
-                            samples_trigger_offset = mem_addr;
+                            offset = mem_addr;
                         end
                 end
                 ST_POST_TRIG:

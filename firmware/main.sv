@@ -106,6 +106,7 @@ module main(
     wire [7:0] sampler_addr_in;
     wire       sampler_we;
     wire       sampler_clk;
+    wire [7:0] offset;
     fake_adc fake_adc_instance(
         .clk     (adc_clk),
         .rst     (KEY4),
@@ -121,7 +122,8 @@ module main(
         .mem_data (sampler_data_in),
         .mem_addr (sampler_addr_in),
         .mem_we   (sampler_we),
-        .mem_clk  (sampler_clk)
+        .mem_clk  (sampler_clk),
+        .offset   (offset)
     );
     // sampler_instance stop
 
@@ -148,8 +150,24 @@ module main(
         .mem_addr(sample_reader_addr_out),
         .mem_oe(sample_reader_oe)
     );
-
     // sample_reader_instance stop
+
+    // last offset getter start
+    wire       sample_offset_activate, sample_offset_done;
+    wire [7:0] sample_offset_tx_data;
+    wire       sample_offset_tx_start;
+    sample_offset sample_offset_instance(
+        .clk_50mhz(CLK),
+        .reset(KEY4),
+        .activate(sample_offset_activate),
+        .done(sample_offset_done),
+        .tx_active(tx_active),
+        .tx_data(sample_offset_tx_data),
+        .tx_start(sample_offset_tx_start),
+        .offset(offset)
+    );
+
+    // last offset getter stop
 
 
     // replayer_instance start
@@ -200,6 +218,9 @@ module main(
             end else if (sample_reader_activate) begin
                 tx_data = sampler_reader_tx_data;
                 tx_start = sampler_reader_tx_start;
+            end else if (sample_offset_activate) begin
+                tx_data = sample_offset_tx_data;
+                tx_start = sample_offset_tx_start;
             end else
                 tx_start = 0;
         end
@@ -225,6 +246,7 @@ module main(
     parameter ST_SAMPLER = 8'h21;
     parameter ST_SAMPLE_READ = 8'h22;
     parameter ST_MEM_CLEAR = 8'h23;
+    parameter ST_OFFSET_GETTER = 8'h24;
     parameter ST_REPLAYER = 8'h71;
     parameter ST_REPLY_CNT = 8'h72;
 
@@ -248,6 +270,7 @@ module main(
                 ST_REPLAYER: replayer_activate = 1;
                 ST_REPLY_CNT: reply_cnt_activate = 1;
                 ST_MEM_CLEAR: mem_clear_activate = 1;
+                ST_OFFSET_GETTER: sample_offset_activate = 1;
 
                 ST_INIT:
                     if(rx_ready)
@@ -260,6 +283,7 @@ module main(
                     replayer_activate = 0;
                     reply_cnt_activate = 0;
                     mem_clear_activate = 0;
+                    sample_offset_activate = 0;
 
                     if(~rx_ready && ~tx_active)
                     state = ST_INIT;
@@ -279,6 +303,9 @@ module main(
                 state = ST_READY;
 
             if (mem_clear_activate && mem_clear_done)
+                state = ST_READY;
+
+            if (sample_offset_activate && sample_offset_done)
                 state = ST_READY;
         end
 
