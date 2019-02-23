@@ -20,7 +20,10 @@ module sampler(
     output [7:0] mem_data,
     output [7:0] mem_addr,
     output       mem_we,
-    output [SAMPLE_DEPTH-1:0] offset
+    output [SAMPLE_DEPTH-1:0] offset,
+
+    input force_trig
+
     );
 
     parameter SAMPLE_DEPTH = 8; // 256 samples
@@ -44,10 +47,11 @@ module sampler(
 
     parameter ST_IDLE = 0;
     parameter ST_SETUP = 1;
-    parameter ST_PRE_TRIG = 2;
-    parameter ST_POST_TRIG = 3;
-    parameter ST_SHIFT = 4;
-    parameter ST_CLEAR = 5;
+    parameter ST_ACQUIRE = 2;
+    parameter ST_PRE_TRIG = 3;
+    parameter ST_POST_TRIG = 4;
+    parameter ST_SHIFT = 5;
+    parameter ST_CLEAR = 6;
 
 
         // activate output adc only when activated
@@ -84,8 +88,15 @@ module sampler(
                     activate_mem_clk = 1;
                     mem_we = 1;  // enable writing into memory
                     mem_addr = 0;  // start from zero
-                    sampler_state = ST_PRE_TRIG;
+                    sampler_state = ST_ACQUIRE;
                     remaining_samples = (1 << (SAMPLE_DEPTH-1))-1; // half of samples
+                end
+
+                ST_ACQUIRE: begin  /* get at least 128 samples, BEFORE the trigger */
+                    mem_addr = mem_addr + 1;
+                    mem_data = adc_data;
+                    if (mem_addr >= (1 << (SAMPLE_DEPTH - 1)) - 1)
+                        sampler_state = ST_PRE_TRIG;
                 end
 
                 /* store samples in memmory and add 1 to address and let it
@@ -93,7 +104,7 @@ module sampler(
                 ST_PRE_TRIG: begin
                     mem_addr = mem_addr+1;
                     mem_data = adc_data;
-                    if (trig)
+                    if (trig || force_trig)
                         begin
                             sampler_state = ST_POST_TRIG;
                             offset = mem_addr;

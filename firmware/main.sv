@@ -7,6 +7,8 @@ module main(
 
     input        KEY4,  // RESET
 
+    input        KEY3,  // FORCE_TRIGGER
+
     output       DS_A, DS_B, DS_C, DS_D, DS_E, DS_F, DS_G,
     output       DSEN_1, DSEN_2, DSEN_3, DSEN_4, // active LOW
     output       LED_GREEN, LED_RED
@@ -97,7 +99,8 @@ module main(
     );
     // mem clear stop
 
-
+    assign LED_GREEN = sampler_activate;
+    assign LED_RED = sampler_done;
     // sampler_instance start
     wire       sampler_activate, sampler_done;
     wire [7:0] adc_data;
@@ -123,13 +126,10 @@ module main(
         .mem_addr (sampler_addr_in),
         .mem_we   (sampler_we),
         .mem_clk  (sampler_clk),
-        .offset   (offset)
+        .offset   (offset),
+        .force_trig(~KEY3)
     );
     // sampler_instance stop
-
-
-    assign LED_GREEN = sampler_activate;
-    assign LED_RED = sampler_done;
 
 
     // sample_reader_instance start
@@ -166,7 +166,6 @@ module main(
         .tx_start(sample_offset_tx_start),
         .offset(offset)
     );
-
     // last offset getter stop
 
 
