@@ -110,11 +110,6 @@ module main(
     wire       sampler_we;
     wire       sampler_clk;
     wire [7:0] offset;
-    fake_adc fake_adc_instance(
-        .clk     (adc_clk),
-        .rst     (KEY4),
-        .data_out(adc_data)
-    );
     sampler sampler_instance(
         .clk_50mhz(CLK),
         .reset    (KEY4),
@@ -151,6 +146,51 @@ module main(
         .mem_oe(sample_reader_oe)
     );
     // sample_reader_instance stop
+
+
+    // adc selector start
+        // first ADC
+        wire       first_adc_clk;
+        wire [7:0] first_adc_data;
+        fake_adc #(
+            .WIDTH(8),
+            .INC(5),
+            .DEC(5)) first_fake( .clk(first_adc_clk), .rst(KEY4), .data_out(first_adc_data) );
+        // second ADC
+        wire       second_adc_clk;
+        wire [7:0] second_adc_data;
+        fake_adc #(
+            .WIDTH(8),
+            .INC(5),
+            .DEC(5)) second_fake( .clk(second_adc_clk), .rst(KEY4), .data_out(second_adc_data) );
+        // third ADC
+        wire       third_adc_clk;
+        wire [7:0] third_adc_data;
+        fake_adc #(
+            .WIDTH(8),
+            .INC(25),
+            .DEC(255)) third_fake( .clk(third_adc_clk), .rst(KEY4), .data_out(third_adc_data) );
+
+    wire selector_done, selector_activate;
+    adc_selector adc_selector_instance(
+        .clk(CLK),
+        .rst(KEY4),
+        .activate(selector_activate),
+        .done(selector_done),
+        .rx_data(rx_data),
+        .rx_ready(rx_ready),
+        .adc1_data(first_adc_data),
+        .adc1_clk(first_adc_clk),
+        .adc2_data(second_adc_data),
+        .adc2_clk(second_adc_clk),
+        .adc3_data(third_adc_data),
+        .adc3_clk(third_adc_clk),
+        .adc_data(adc_data),
+        .adc_clk(adc_clk)
+    );
+    // adc selector stop
+
+
 
     // last offset getter start
     wire       sample_offset_activate, sample_offset_done;
@@ -246,6 +286,7 @@ module main(
     parameter ST_SAMPLE_READ = 8'h22;
     parameter ST_MEM_CLEAR = 8'h23;
     parameter ST_OFFSET_GETTER = 8'h24;
+    parameter ST_ADC_SELECTOR = 8'h25;
     parameter ST_REPLAYER = 8'h71;
     parameter ST_REPLY_CNT = 8'h72;
 
@@ -270,6 +311,7 @@ module main(
                 ST_REPLY_CNT: reply_cnt_activate = 1;
                 ST_MEM_CLEAR: mem_clear_activate = 1;
                 ST_OFFSET_GETTER: sample_offset_activate = 1;
+                ST_ADC_SELECTOR: selector_activate = 1;
 
                 ST_INIT:
                     if(rx_ready)
@@ -283,6 +325,7 @@ module main(
                     reply_cnt_activate = 0;
                     mem_clear_activate = 0;
                     sample_offset_activate = 0;
+                    selector_activate = 0;
 
                     if(~rx_ready && ~tx_active)
                     state = ST_INIT;
@@ -306,6 +349,10 @@ module main(
 
             if (sample_offset_activate && sample_offset_done)
                 state = ST_READY;
+
+            if (selector_activate && selector_done)
+                state = ST_READY;
+
         end
 
 endmodule

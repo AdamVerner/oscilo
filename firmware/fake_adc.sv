@@ -3,23 +3,44 @@
  */
 
 module fake_adc(
-    input        clk,
-    input        rst,
-    output [7:0] data_out = 0
+    input              clk, rst,
+    output [WIDTH-1:0] data_out
     );
+
+    parameter WIDTH = 8;
+    parameter INC = 1;
+    parameter DEC = 1;
+
+    reg [WIDTH:0] stage_data = 0;  // one bit bigger, for securing overflows
+
+    assign data_out = stage_data - 127;
+
+    reg [1:0] adc_state;
+    parameter ST_INC = 0;
+    parameter ST_DEC = 1;
 
     always @(posedge clk)
         begin
             if (~rst)
-                data_out = 0;
-            else
-                begin
-                    data_out += 1;
-                    if(data_out == 255)
-                        data_out = 0;
-                end
-
-
+                stage_data = 127;
+            else begin
+                case(adc_state)
+                    ST_INC: begin
+                        stage_data += INC;
+                        if(stage_data >= 383)
+                            adc_state = ST_DEC;
+                    end
+                    ST_DEC: begin
+                        stage_data -= DEC;
+                        if (stage_data <= 127)
+                            adc_state = ST_INC;
+                    end
+                    default: begin
+                        stage_data = 127;
+                        adc_state = ST_INC;
+                    end
+                endcase
+            end
         end
 
 endmodule
