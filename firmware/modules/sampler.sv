@@ -18,8 +18,8 @@ module sampler(
 
     output       mem_clk,
     output [7:0] mem_data,
-    output [7:0] mem_addr,
     output       mem_we,
+    output [SAMPLE_DEPTH-1:0] mem_addr,
     output [SAMPLE_DEPTH-1:0] offset,
 
     input trig,

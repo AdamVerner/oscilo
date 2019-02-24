@@ -23,6 +23,9 @@ module main(
     reg [7:0]  state;
 
 
+    parameter SAMPLE_DEPTH = 8;   /* max adress is (1 << SAMPLE_DEPTH)-1 */
+
+
     uart_rx reciever(
         .clk    (CLK),
         .rxd    (RXD),
@@ -59,14 +62,13 @@ module main(
         .dsen4    (DSEN_4)
     );
 
-
     // sampling memmory start
     wire       sm_we, sm_oe, sm_clk;
     wire [7:0] sm_data_in;
     wire [7:0] sm_data_out;
     wire [7:0] sm_addr_in;
     wire [7:0] sm_addr_out;
-    ram_sw_ar#(.DATA_WIDTH(8), .ADDR_WIDTH(8)) sample_memmory(
+    ram_sw_ar#(.DATA_WIDTH(8), .ADDR_WIDTH(SAMPLE_DEPTH)) sample_memmory(
         .clk     (sm_clk),
         .addr_in (sm_addr_in),
         .addr_out(sm_addr_out),
@@ -82,10 +84,10 @@ module main(
     // mem clearer start
     wire       mem_clear_activate, mem_clear_done;
     wire [7:0] mem_clear_data_in;
-    wire [7:0] mem_clear_addr_in;
+    wire [SAMPLE_DEPTH-1:0] mem_clear_addr_in;
     wire       mem_clear_we;
     wire       mem_clear_clk;
-    mem_clear mem_clear_instance(
+    mem_clear #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) mem_clear_instance(
       .clk_50mhz(CLK),
       .reset    (KEY4),
       .activate (mem_clear_activate),
@@ -139,11 +141,11 @@ module main(
     wire [7:0] adc_data;
     wire       adc_clk;
     wire [7:0] sampler_data_in;
-    wire [7:0] sampler_addr_in;
     wire       sampler_we;
     wire       sampler_clk;
-    wire [7:0] offset;
-    sampler sampler_instance(
+    wire [SAMPLE_DEPTH-1:0] sampler_addr_in;
+    wire [SAMPLE_DEPTH-1:0] offset;
+    sampler #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sampler_instance(
         .clk_50mhz(CLK),
         .reset    (KEY4),
         .activate (sampler_activate),
@@ -166,9 +168,9 @@ module main(
     wire       sample_reader_activate, sample_reader_done;
     wire [7:0] sampler_reader_tx_data;
     wire       sampler_reader_tx_start;
-    wire [7:0] sample_reader_addr_out;
     wire       sample_reader_oe;
-    sample_reader sample_reader_instace(
+    wire [SAMPLE_DEPTH-1:0] sample_reader_addr_out;
+    sample_reader #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sample_reader_instace(
         .clk_50mhz(CLK),
         .reset(KEY4),
         .activate(sample_reader_activate),
@@ -189,8 +191,8 @@ module main(
         wire [7:0] first_adc_data;
         fake_adc #(
             .WIDTH(8),
-            .INC(5),
-            .DEC(5)) first_fake( .clk(first_adc_clk), .rst(KEY4), .data_out(first_adc_data) );
+            .INC(2),
+            .DEC(2)) first_fake( .clk(first_adc_clk), .rst(KEY4), .data_out(first_adc_data) );
         // second ADC
         wire       second_adc_clk;
         wire [7:0] second_adc_data;
@@ -230,7 +232,7 @@ module main(
     wire       sample_offset_activate, sample_offset_done;
     wire [7:0] sample_offset_tx_data;
     wire       sample_offset_tx_start;
-    sample_offset sample_offset_instance(
+    sample_offset #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sample_offset_instance(
         .clk_50mhz(CLK),
         .reset(KEY4),
         .activate(sample_offset_activate),

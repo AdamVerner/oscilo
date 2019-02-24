@@ -49,3 +49,6 @@ output_files
 *~
 *sopc_*
 PLLJ_PLLSPE_INFO.txt # The generated PLL specification file
+
+
+sine.mem

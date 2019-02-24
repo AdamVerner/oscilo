@@ -14,18 +14,18 @@ module sample_reader(
     output       tx_start,
 
     input [7:0]  mem_data,
-    output [7:0] mem_addr = 0,
-    output       mem_oe = 0
+    output       mem_oe = 0,
+    output [SAMPLE_DEPTH-1:0] mem_addr = 0
 );
 
-    reg [22:0] sleep_counter;  // max = 8388607
-    wire [3:0] reader_state;
+    parameter SAMPLE_DEPTH = 0;
+
+    wire [1:0] reader_state;
 
     parameter ST_IDLE = 0;
     parameter ST_FETCH = 1;
-	 parameter ST_WAIT = 2;
-    parameter ST_TX = 3;
-    parameter ST_DONE = 4;
+    parameter ST_TX = 2;
+    parameter ST_DONE = 3;
 
 
     always @(posedge clk_50mhz)
@@ -45,7 +45,7 @@ module sample_reader(
                 begin
                     tx_data = mem_data;
 
-                    if(mem_addr == 255)
+                    if(mem_addr == (1 << SAMPLE_DEPTH)-1)
                         reader_state = ST_DONE;
                     else
                     begin
@@ -58,15 +58,9 @@ module sample_reader(
                     if(~tx_active)
                     begin
                         tx_start = 0;
-                        reader_state = ST_WAIT;
+                        reader_state = ST_FETCH;
                         mem_addr += 1;
                     end
-                end
-                ST_WAIT:
-                begin
-                    sleep_counter = sleep_counter + 1;
-                    if(sleep_counter >= 5000000) // wait 0.1 sec
-                        reader_state = ST_FETCH;
                 end
                 ST_DONE:
                 begin

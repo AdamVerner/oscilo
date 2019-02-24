@@ -11,9 +11,11 @@ module mem_clear(
 
     output       mem_clk,
     output [7:0] mem_data,
-    output [7:0] mem_addr,
+    output [SAMPLE_DEPTH-1:0] mem_addr,
     output       mem_we
 );
+
+    parameter SAMPLE_DEPTH = 8;
 
     reg [3:0] sampler_state;
     parameter ST_IDLE = 0;
@@ -51,7 +53,7 @@ module mem_clear(
                     mem_we = 1;
                     mem_addr += 1;
                     mem_data = information;
-                    if (mem_addr == 255) begin
+                    if (mem_addr == (1 << SAMPLE_DEPTH)-1 ) begin
                       sampler_state = ST_CLEAR;
                     end
                 end
