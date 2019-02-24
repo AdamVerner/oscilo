@@ -17,8 +17,6 @@ module sample_offset(
 
 );
 
-    parameter offset = 32'h12345678;
-
     parameter SAMPLE_DEPTH = 8;
 
     reg [22:0] sleep_counter;  // max = 8388607
