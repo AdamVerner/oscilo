@@ -105,6 +105,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE fake_adc.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ram_sw_ar.sv
 set_global_assignment -name SYSTEMVERILOG_FILE display_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE seven_segment.sv
+set_global_assignment -name SYSTEMVERILOG_FILE trigger.sv
 
 set_global_assignment -name SYSTEMVERILOG_FILE modules/adc_selector.sv
 set_global_assignment -name SYSTEMVERILOG_FILE modules/mem_clear.sv
@@ -113,3 +114,4 @@ set_global_assignment -name SYSTEMVERILOG_FILE modules/reply_cnt.sv
 set_global_assignment -name SYSTEMVERILOG_FILE modules/sample_offset.sv
 set_global_assignment -name SYSTEMVERILOG_FILE modules/sample_reader.sv
 set_global_assignment -name SYSTEMVERILOG_FILE modules/sampler.sv
+set_global_assignment -name SYSTEMVERILOG_FILE modules/trig_config.sv

@@ -99,9 +99,42 @@ module main(
     );
     // mem clear stop
 
+
+    // trigger  and trigger configurator start
+    wire trig_config_activate, trig_config_done;
+    wire [7:0] upper_bound, lower_bound;
+    wire en_rise, en_fall;
+    trig_config trig_config_instance(
+        .clk(CLK),
+        .rst(KEY4),
+        .activate(trig_config_activate),
+        .done(trig_config_done),
+        .rx_data(rx_data),
+        .rx_ready(rx_ready),
+        .upper_bound(upper_bound),
+        .lower_bound(lower_bound),
+        .en_rise(en_rise),
+        .en_fall(en_fall)
+    );
+    wire trig_rst, trig;
+    trigger #(.WIDTH(8)) trigger_instance(
+        .rst(KEY4),
+        .clk(adc_clk),   // wire it parallel to sampler
+        .data(adc_data),
+        .trig_rst(trig_rst),
+        .upper_bound(upper_bound),
+        .lower_bound(lower_bound),
+        .en_rise(en_rise),
+        .en_fall(en_fall),
+        .trigger(trig)
+    );
+    // trigger  and trigger configurator stop
+
+
+
+    // sampler_instance start
     assign LED_GREEN = sampler_activate;
     assign LED_RED = sampler_done;
-    // sampler_instance start
     wire       sampler_activate, sampler_done;
     wire [7:0] adc_data;
     wire       adc_clk;
@@ -122,7 +155,9 @@ module main(
         .mem_we   (sampler_we),
         .mem_clk  (sampler_clk),
         .offset   (offset),
-        .force_trig(~KEY3)
+        .force_trig(~KEY3),
+        .trig(trig),
+        .trig_reset(trig_rst)
     );
     // sampler_instance stop
 
@@ -189,7 +224,6 @@ module main(
         .adc_clk(adc_clk)
     );
     // adc selector stop
-
 
 
     // last offset getter start
@@ -282,11 +316,15 @@ module main(
     // STATE_WATCHER states
     parameter ST_READY = 8'h01;  // just wait one clk cycle
     parameter ST_INIT = 8'h00;
+
     parameter ST_SAMPLER = 8'h21;
     parameter ST_SAMPLE_READ = 8'h22;
     parameter ST_MEM_CLEAR = 8'h23;
     parameter ST_OFFSET_GETTER = 8'h24;
     parameter ST_ADC_SELECTOR = 8'h25;
+
+    parameter ST_TRIG_CONFIG = 8'h31;
+
     parameter ST_REPLAYER = 8'h71;
     parameter ST_REPLY_CNT = 8'h72;
 
@@ -312,6 +350,7 @@ module main(
                 ST_MEM_CLEAR: mem_clear_activate = 1;
                 ST_OFFSET_GETTER: sample_offset_activate = 1;
                 ST_ADC_SELECTOR: selector_activate = 1;
+                ST_TRIG_CONFIG: trig_config_activate = 1;
 
                 ST_INIT:
                     if(rx_ready)
@@ -326,6 +365,7 @@ module main(
                     mem_clear_activate = 0;
                     sample_offset_activate = 0;
                     selector_activate = 0;
+                    trig_config_activate = 0;
 
                     if(~rx_ready && ~tx_active)
                     state = ST_INIT;
@@ -351,6 +391,9 @@ module main(
                 state = ST_READY;
 
             if (selector_activate && selector_done)
+                state = ST_READY;
+
+            if (trig_config_activate && trig_config_done)
                 state = ST_READY;
 
         end

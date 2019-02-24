@@ -22,6 +22,9 @@ module sampler(
     output       mem_we,
     output [SAMPLE_DEPTH-1:0] offset,
 
+    input trig,
+    output trig_reset = 1,
+
     input force_trig
 
     );
@@ -41,7 +44,6 @@ module sampler(
     wire [SAMPLE_DEPTH-1:0] remaining_samples;
     wire                    activate_adc_clk;
     wire                    activate_mem_clk;
-    wire                    trig;
 
     wire [3:0]              sampler_state;
 
@@ -58,16 +60,6 @@ module sampler(
     assign adc_clk = std_clk && activate_adc_clk;
     assign mem_clk = std_clk && activate_mem_clk;
 
-
-        // TRIGGER LOGIC BEGIN
-    reg                     thr1, thr2;
-    always @(posedge adc_clk)
-        begin
-            thr1 <= (adc_data >= 8'h80);
-            thr2 <= thr1;
-        end
-    assign trig = thr1 & ~thr2; /* assert true for one clock*/
-        // TRIGGER LOGIC END
 
 
         /* TODO add clk_divided*/
@@ -95,6 +87,7 @@ module sampler(
                 ST_ACQUIRE: begin  /* get at least 128 samples, BEFORE the trigger */
                     mem_addr = mem_addr + 1;
                     mem_data = adc_data;
+                    trig_reset = 1;
                     if (mem_addr >= (1 << (SAMPLE_DEPTH - 1)) - 1)
                         sampler_state = ST_PRE_TRIG;
                 end
@@ -102,6 +95,7 @@ module sampler(
                 /* store samples in memmory and add 1 to address and let it
                 * overflow indefinitley (redneck circular-buffer) */
                 ST_PRE_TRIG: begin
+                    trig_reset = 0;
                     mem_addr = mem_addr+1;
                     mem_data = adc_data;
                     if (trig || force_trig)
