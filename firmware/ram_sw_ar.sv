@@ -17,9 +17,11 @@ module ram_sw_ar#(parameter DATA_WIDTH = 8,
     input wire                   oe        // Output Enable
 );
 
-
     reg [DATA_WIDTH-1:0] mem [0:(1<<ADDR_WIDTH)-1];
 
+    initial begin
+        $readmemh("sine.mem", mem);
+    end
 
         /* Synchronous memmory write */
     always @(posedge clk)
