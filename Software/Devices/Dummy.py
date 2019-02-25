@@ -9,8 +9,9 @@ always replies with same waveforms and so on....
 from multiprocessing import Process
 from time import sleep
 
-from Exceptions import OutOfInitState
 from numpy import arange, sin, pi
+
+from Software.Devices.Exceptions import OutOfInitState
 
 
 class Device(object):

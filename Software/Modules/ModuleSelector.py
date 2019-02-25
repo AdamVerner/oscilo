@@ -23,7 +23,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from Modules.Scope.Module import Module as ScopeModule
+from Software.Modules.Scope.Module import Module as ScopeModule
 
 
 class ModuleSelector(Gtk.Notebook):
@@ -46,7 +46,7 @@ class ModuleSelector(Gtk.Notebook):
 
 
 if __name__ == '__main__':
-    from TestUtil import test_util
-    from Devices.Dummy import Device
+    from Software.TestUtil import test_util
+    from Software.Devices import Device
 
     test_util(ModuleSelector(Device()))

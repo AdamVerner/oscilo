@@ -21,7 +21,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
 from multiprocessing import Pipe
-from Popups import task_fail
+from Software.Popups import task_fail
+from Software.Devices import Device
 
 LABEL_START = '<big>'
 LABEL_END = '</big>'
@@ -35,13 +36,14 @@ class Settings(Gtk.Grid):
     wrapper for the underlying classes
     """
 
-    def __init__(self, device):
+    def __init__(self, device: Device):
         super(Settings, self).__init__()
         self.device = device
         self.size = (800, 400)
 
         self.trigger = Trigger(self.device)
-        self.vertical = Vertical(self.device)
+        # self.vertical = Vertical(self.device)
+        self.vertical = Gtk.Label('')
         self.horizontal = Horizontal(self.device)
         self.filtering = Filters()
         self.control = Control(self.device)
@@ -79,12 +81,12 @@ class Trigger(Gtk.Grid):
     |------------------|
     """
 
-    def __init__(self, device):
+    def __init__(self, device: Device):
         super(Trigger, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'TRIGGER MENU' + LABEL_END, **LABEL_PROPS)
 
-        level_adjust = Gtk.Adjustment(self.device.trig_lvl, self.device.trig_min,
+        level_adjust = Gtk.Adjustment(self.device.get_trig_lvl(), self.device.trig_min,
                                       self.device.trig_max, 1, 1, 1)
         level_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, level_adjust)
         level_scale.set_size_request(-1, 100)
@@ -92,7 +94,7 @@ class Trigger(Gtk.Grid):
         level_scale.set_round_digits(0)
 
         def set_trigger_level(btn):
-            self.device.trig_lvl = level_scale.get_value()
+            self.device.set_trig_lvl(level_scale.get_value())
             pass
 
         level_set = Gtk.Button('SET')
@@ -150,7 +152,7 @@ class Vertical(Gtk.Grid):
     volts/div
     """
 
-    def __init__(self, device):
+    def __init__(self, device: Device):
         super(Vertical, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'VERTICAL MENU' + LABEL_END, **LABEL_PROPS)
@@ -239,7 +241,7 @@ class Horizontal(Gtk.Grid):
     |------------------|
     """
 
-    def __init__(self, device):
+    def __init__(self, device: Device):
         super(Horizontal, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'HORIZONTAL MENU' + LABEL_END, **LABEL_PROPS)
@@ -293,7 +295,7 @@ class Control(Gtk.Grid):
 
     push_func = None  # function to call when automatic sample collection is wanted
 
-    def __init__(self, device):
+    def __init__(self, device: Device):
         super(Control, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'CONTROL' + LABEL_END, **LABEL_PROPS)
@@ -354,7 +356,7 @@ class Control(Gtk.Grid):
 
 
 if __name__ == '__main__':
-    from TestUtil import test_util
-    from Devices.Dummy import Device
+    from Software.TestUtil import test_util
+    from Software.Devices import Device
 
     test_util(Settings(Device()))

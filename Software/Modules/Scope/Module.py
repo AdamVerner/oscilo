@@ -17,9 +17,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from Modules.Scope.Plot import Plot
-from Modules.Scope.Settings import Settings
-from Modules.Scope.Signals import Signals
+from Software.Modules.Scope.Plot import Plot
+from Software.Modules.Scope.Settings import Settings
+from Software.Modules.Scope.Signals import Signals
 
 
 class Module(Gtk.Grid):
@@ -43,9 +43,8 @@ class Module(Gtk.Grid):
 
 
 if __name__ == '__main__':
-    from TestUtil import test_util
-    from Devices.Dummy import Device
-
+    from Software.TestUtil import test_util
+    from Software.Devices import Device
     m = Module(device=Device())
 
     test_util(m)

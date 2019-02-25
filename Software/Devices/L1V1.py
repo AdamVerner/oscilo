@@ -9,12 +9,13 @@ from __future__ import absolute_import
 import logging
 from multiprocessing import Process
 from time import sleep
+from typing import List, Callable
 
 from serial import Serial
 
 root_logger = logging.getLogger(__name__)
 
-from .Exceptions import *
+from Software.Devices.Exceptions import *
 
 
 class TrigModes(object):
@@ -29,24 +30,12 @@ class Device(object):
     sample_count = 255  # maximum number of samples the device can store
 
     _trigger_mode = TRIG_MODES.RISE
-    _trigger_level = 0x80
-    _upper_bound = 0x80
-    _lower_bound = 0x80
+    _upper_bound = b'\x80'
+    _lower_bound = b'\x80'
 
     trig_max = 255
     trig_min = 0
     trig_step = 1
-
-    vga_level = 0  # TODO add setter and getter functions
-    vga_max = 255
-    vga_min = 0
-    vga_step = 4
-    att_level = 0  # TODO add setter and getter functions
-    # att usually doesn't have that level-variability as vga, so store the values in list
-
-    att_steps = [1, 4, 10, 20]
-
-    offset = 0
 
     _SAMPLER = b'\x21'
     _SAMPLE_READ = b'\x22'
@@ -59,7 +48,7 @@ class Device(object):
 
     available = False
 
-    def __init__(self, port='/dev/ttyUSB1'):
+    def __init__(self, port: str = '/dev/ttyUSB0') -> None:
         """
         initializes USB serial communication port
         asserts, that the device is ready and responding.
@@ -76,7 +65,7 @@ class Device(object):
         self.comm_test()
         self.log.info('device passed initial tests')
 
-    def comm_test(self):
+    def comm_test(self) -> None:
         self.log.info('testing the device')
 
         expected = b''.join([chr(number).encode('utf-8') for number in range(0, 42, 1)])
@@ -91,14 +80,14 @@ class Device(object):
         if data != expected:
             raise DeviceTestError('recieved invalid data, see logs')
 
-    def destroy(self):
+    def destroy(self) -> None:
         """
         cleans up device
         closes serial port
         """
         self.set_memory_to(b'\x55')  # random byte
 
-    def set_memory_to(self, word):
+    def set_memory_to(self, word: bytes) -> None:
         """
         :param word: e.g.: b'\x32'
         """
@@ -107,10 +96,7 @@ class Device(object):
         sleep(0.1)
         self._dev.write(word)
 
-    def get_samples(self, *args, **kwargs):
-
-        if args or kwargs:  # compatibility issue
-            raise Warning('get samples doesn\'t will return all samples, not specified samples')
+    def get_samples(self) -> List[int]:
 
         self._dev.write(self._SAMPLE_READ)  # start sample-reader
         buf = b''
@@ -123,7 +109,7 @@ class Device(object):
             buf += b
 
         samples = list(buf)
-        self.log.info('num of samples =', len(samples))
+        self.log.info('num of samples = %d', len(samples))
 
         if len(samples) != self.sample_count:
             raise CommunicationError('not all samples were received')
@@ -135,9 +121,10 @@ class Device(object):
         stop = offset + self.sample_count // 2
 
         post = (samples + samples + samples)[start:stop]  # place trigger point where it should be
+        post = [int(x) for x in post]
         return post
 
-    def get_sample_offset(self):
+    def get_sample_offset(self) -> int:
 
         self._dev.write(self._OFFSET_GETTER)
         offset = self._dev.read(4)
@@ -145,27 +132,23 @@ class Device(object):
 
         return offset
 
-    @property
-    def trig_lvl(self):
-        return self._trigger_level  # TODO poll from device
+    def get_trig_lvl(self) -> int:
+        if self._trigger_mode == self.TRIG_MODES.FALL:
+            return int(self._lower_bound.hex(), 16)
+        else:
+            return int(self._upper_bound.hex(), 16)
 
-    @trig_lvl.setter
-    def trig_lvl(self, level):
+    def set_trig_lvl(self, level: int) -> None:
         self.log.info('trigger level has been set to: %f' % level)
-        self._upper_bound = level
-        self._lower_bound = level
+        self._upper_bound = chr(int(level)).encode('utf-8')
+        self._lower_bound = chr(int(level)).encode('utf-8')
 
         self._set_trig_modes(self._trigger_mode, self._upper_bound, self._lower_bound)
 
-    @property
-    def trigger_mode(self):
-        if self._trigger_mode == self.TRIG_MODES.FALL:
-            return self._lower_bound
-        else:
-            return self._upper_bound
+    def get_trigger_mode(self) -> int:
+        return int(self._trigger_mode.hex(), 16)
 
-    @trigger_mode.setter
-    def trigger_mode(self, mode):
+    def set_trigger_mode(self, mode: bytes) -> None:
         self.log.info('trigger mode has been set to: %s' % mode)
         # TODO verify if mode is legit
 
@@ -182,21 +165,21 @@ class Device(object):
 
         self._set_trig_modes(self._trigger_mode, self._upper_bound, self._lower_bound)
 
-    def set_bound(self, upper, lower):
+    def set_bound(self, upper: int, lower: int) -> None:
         """set bound for trigger windows"""
-        self._upper_bound = upper
-        self._lower_bound = lower
+        self._upper_bound = chr(int(upper)).encode('utf-8')
+        self._lower_bound = chr(int(lower)).encode('utf-8')
 
         self._set_trig_modes(self._trigger_mode, self._upper_bound, self._lower_bound)
 
-    def _set_trig_modes(self, mode, upper, lower):
+    def _set_trig_modes(self, mode: bytes, upper: bytes, lower: bytes) -> None:
         self._dev.write(self._TRIG_CONFIG)
         self._dev.write(mode)
         self._dev.write(upper)
         self._dev.write(lower)
         sleep(0.2)
 
-    def activate_scope(self, sampling_callback, done_callback):
+    def activate_scope(self, sampling_callback: Callable, done_callback: Callable) -> None:
         """
         :param sampling_callback: function to call when the scope transitions into post_trigger
         :param done_callback:  function to call when scope is done with measurements
@@ -209,5 +192,3 @@ class Device(object):
         # just fake it like a lil bitch and hope nothing goes wrong :)
         Process(target=lambda *_: (sleep(2), sampling_callback())).start()
         Process(target=lambda *_: (sleep(4), done_callback())).start()
-
-        return
