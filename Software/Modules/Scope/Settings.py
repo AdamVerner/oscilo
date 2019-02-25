@@ -119,6 +119,7 @@ class Trigger(Gtk.Grid):
                     btn_othr.props.active = False
 
                 # process each btn
+                # TODO poll trigger modes from device
                 if btn_pressed == btn_othr:
                     task_fail()  # TODO add msg with apology
                 elif btn_pressed == btn_rise:
@@ -298,20 +299,29 @@ class Control(Gtk.Grid):
         self.device = device
         label = Gtk.Label(LABEL_START + 'CONTROL' + LABEL_END, **LABEL_PROPS)
 
-        ctrl_btn  = Gtk.Button('READY')
+        ctrl_btn = Gtk.Button('READY')
+        pull_btn = Gtk.Button('PULL')
+
         self.auto_pull = Gtk.CheckButton()
         auto_pull_lbl = Gtk.Label('Auto pull')
 
         ctrl_btn.connect('pressed', self.ctrl_begin_callback)
+        pull_btn.connect('pressed', lambda _: self.push_func(self.device.get_samples()))
+
 
         self.attach(label, 0, 0, 2, 1)
         self.attach(ctrl_btn, 0, 1, 2, 1)
         self.attach(auto_pull_lbl, 0, 2, 1, 1)
         self.attach(self.auto_pull, 1, 2, 1, 1)
 
+        self.attach(Gtk.Label(''), 0, 3, 2, 1)
+        self.attach(pull_btn, 0, 4, 2, 1)
+
         # Glib workaround begin
         # https://stackoverflow.com/questions/13518452/
         parent_conn, self.child_conn = Pipe(duplex=False)  # Pipe to pump the label data through
+
+        self.child_conn.send("<span color='green'>READY</span>")
 
         def read_data(source, condition):
             """
