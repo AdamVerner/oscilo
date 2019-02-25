@@ -76,6 +76,16 @@ class MainTest(unittest.TestCase):
         print(samples)
         self.assertEqual(word * 255, samples)
 
+    def test_offset(self):
+        self.serial_device.write(b'\x24')
+
+        recv = self.serial_device.read(16)
+
+        self.log.info('recieved %s as an memmory offset point')
+
+        self.assertEqual(len(recv), 4, 'the offset should be 32bit number, so 4 bytes')
+
+
 
 if __name__ == '__main__':
     test_loader = unittest.TestLoader()
