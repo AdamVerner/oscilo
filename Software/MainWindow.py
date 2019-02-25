@@ -7,7 +7,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from Modules.ModuleSelector import ModuleSelector
-from Devices.Dummy import Device
+from Devices.L1V1 import Device
 
 # constant to scale the default window size to
 SIZE_CONST = 0.66

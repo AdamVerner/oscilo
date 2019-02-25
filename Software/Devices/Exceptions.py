@@ -8,6 +8,10 @@ class BaseDeviceException(Exception):
     """
 
 
+class UserRequestError(BaseException):
+    """invalid request for device, it's your fault"""
+
+
 class CommunicationError(BaseDeviceException):
     """
     exceptions usually raised by invalid reply from device
@@ -30,3 +34,10 @@ class OutOfInitState(BaseDeviceException):
     """
     Device is not in init state and something tried to set state.
     """
+
+
+class DeviceTestError(CommunicationError):
+    """
+    The device didn't pass some mandatory tests, that verify the functionality of the device
+    """
+
