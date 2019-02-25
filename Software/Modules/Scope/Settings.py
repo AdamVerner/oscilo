@@ -17,14 +17,14 @@
 """
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
 from multiprocessing import Pipe
 from Popups import task_fail
 
-
 LABEL_START = '<big>'
-LABEL_END   = '</big>'
+LABEL_END = '</big>'
 LABEL_PROPS = {'xpad': 12,
                'use_markup': True
                }
@@ -40,11 +40,11 @@ class Settings(Gtk.Grid):
         self.device = device
         self.size = (800, 400)
 
-        self.trigger    = Trigger(self.device)
-        self.vertical   = Vertical(self.device)
+        self.trigger = Trigger(self.device)
+        self.vertical = Vertical(self.device)
         self.horizontal = Horizontal(self.device)
-        self.filtering  = Filters()
-        self.control    = Control(self.device)
+        self.filtering = Filters()
+        self.control = Control(self.device)
 
         # TODO add dividers
         self.set_border_width(10)
@@ -53,11 +53,11 @@ class Settings(Gtk.Grid):
         self.set_row_homogeneous(True)
         self.set_column_homogeneous(True)
 
-        self.attach(self.trigger,    0, 0, 1, 1)
-        self.attach(self.vertical,   1, 0, 1, 1)
+        self.attach(self.trigger, 0, 0, 1, 1)
+        self.attach(self.vertical, 1, 0, 1, 1)
         self.attach(self.horizontal, 2, 0, 1, 1)
-        self.attach(self.filtering,  3, 0, 1, 1)
-        self.attach(self.control,    4, 0, 1, 1)
+        self.attach(self.filtering, 3, 0, 1, 1)
+        self.attach(self.control, 4, 0, 1, 1)
 
 
 class Trigger(Gtk.Grid):
@@ -182,7 +182,7 @@ class Vertical(Gtk.Grid):
         off_set.connect('pressed', off_callback)
 
         vga_adj = Gtk.Adjustment(self.device.vga_level, self.device.vga_min, self.device.vga_max,
-                                 1, 1,)
+                                 1, 1, )
         vga_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, vga_adj)
         vga_scale.set_size_request(-1, 100)
         vga_scale.set_inverted(True)
@@ -199,14 +199,13 @@ class Vertical(Gtk.Grid):
 
         for step in self.device.att_steps:
             att_scale.add_mark(step, Gtk.PositionType.RIGHT)
-        
+
         off_adj = Gtk.Adjustment(self.device.offset, 0, 25, 1, 1)
 
         off_scale = Gtk.Scale.new(Gtk.Orientation.VERTICAL, off_adj)
         off_scale.set_size_request(-1, 100)
         att_scale.set_inverted(True)
         att_scale.set_round_digits(0)
-
 
         self.attach(label, 0, 0, 3, 1)
 
@@ -217,7 +216,6 @@ class Vertical(Gtk.Grid):
         self.attach(vga_scale, 0, 2, 1, 1)
         self.attach(att_scale, 1, 2, 1, 1)
         self.attach(off_scale, 2, 2, 1, 1)
-
 
         self.attach(vga_set, 0, 3, 1, 1)
         self.attach(att_set, 1, 3, 1, 1)
@@ -277,6 +275,7 @@ class Filters(Gtk.Grid):
     BandPass
     Derivation
     """
+
     def __init__(self):
         super(Filters, self).__init__()
         label = Gtk.Label(LABEL_START + 'FILTERS' + LABEL_END, **LABEL_PROPS)
@@ -307,7 +306,6 @@ class Control(Gtk.Grid):
 
         ctrl_btn.connect('pressed', self.ctrl_begin_callback)
         pull_btn.connect('pressed', lambda _: self.push_func(self.device.get_samples()))
-
 
         self.attach(label, 0, 0, 2, 1)
         self.attach(ctrl_btn, 0, 1, 2, 1)
@@ -358,4 +356,5 @@ class Control(Gtk.Grid):
 if __name__ == '__main__':
     from TestUtil import test_util
     from Devices.Dummy import Device
+
     test_util(Settings(Device()))

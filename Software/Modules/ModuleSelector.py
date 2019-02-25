@@ -18,8 +18,8 @@
 |-------------------------------------------------------|
 """
 
-
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -48,4 +48,5 @@ class ModuleSelector(Gtk.Notebook):
 if __name__ == '__main__':
     from TestUtil import test_util
     from Devices.Dummy import Device
+
     test_util(ModuleSelector(Device()))

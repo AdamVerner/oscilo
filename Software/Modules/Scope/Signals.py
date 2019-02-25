@@ -16,6 +16,7 @@
 
 """
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -36,7 +37,6 @@ class Signals(Gtk.Grid):
 
 if __name__ == '__main__':
     from TestUtil import test_util
+
     s = Signals()
     test_util(s)
-
-

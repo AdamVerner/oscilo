@@ -6,15 +6,14 @@ dummy fpga for testing and development of user app
 always replies with same waveforms and so on....
 """
 
-from numpy import arange, sin, pi
-from time import sleep
 from multiprocessing import Process
+from time import sleep
 
 from Exceptions import OutOfInitState
+from numpy import arange, sin, pi
 
 
 class Device(object):
-
     STATE_INIT = 0x00
     STATE_SAMPLE_MEM_READER = 0x02
     STATE_SAMPLER = 0x04
@@ -46,8 +45,6 @@ class Device(object):
 
     offset = 0
 
-
-
     def __init__(self):
         self.log_data = list()  # each line is one information of device log
         self.state = self.STATE_INIT
@@ -57,7 +54,7 @@ class Device(object):
 
         x = arange(samples)  # the points on the x axis for plotting
         # compute the value (amplitude) of the sin wave at the for each sample
-        y = [sin(2*pi*self.sample_speed * (i/samples)) for i in x]
+        y = [sin(2 * pi * self.sample_speed * (i / samples)) for i in x]
 
         # return the state of the device back to init
         self._state = self.STATE_INIT
@@ -83,7 +80,7 @@ class Device(object):
         """
         workaround for logging the data, that should be red from device
         """
-        self.log('received: %s ' % data[:n-1])
+        self.log('received: %s ' % data[:n - 1])
 
     def serial_write(self, data):
         self.log('writing to device: %s' % data)
@@ -132,7 +129,6 @@ class Device(object):
 
 
 if __name__ == '__main__':
-
     D = Device()
     print(D.state)
     print(D.get_samples(512))

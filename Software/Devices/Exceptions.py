@@ -40,4 +40,3 @@ class DeviceTestError(CommunicationError):
     """
     The device didn't pass some mandatory tests, that verify the functionality of the device
     """
-

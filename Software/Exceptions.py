@@ -30,4 +30,3 @@ class OutOfInitState(BaseDeviceException):
     """
     Device is not in init state and something tried to set state.
     """
-
