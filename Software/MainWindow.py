@@ -28,9 +28,14 @@ class MainWindow(Gtk.Window):
         s = self.get_screen()
 
         # get the monitor which the windows is on
-        monitor = s.get_monitor_geometry(s.get_monitor_at_window(s.get_active_window()))
+        try:
+                active_window = s.get_active_window()
+                monitor_at_window = s.get_monitor_at_window(active_window)
+                monitor = s.get_monitor_geometry(monitor_at_window)
+                self.set_default_size(monitor.width * SIZE_CONST, monitor.height * SIZE_CONST)
+        except TypeError:
+            pass
 
-        self.set_default_size(monitor.width * SIZE_CONST, monitor.height * SIZE_CONST)
         self.set_border_width(0)
         self.connect('destroy', Gtk.main_quit)
 
