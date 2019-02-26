@@ -6,6 +6,15 @@ import Software.Devices.L1V1
 root_logger = logging.getLogger(__name__)
 
 
+def get_available_devices():
+    devices = [  # list of all available devices
+        Software.Devices.Dummy.Device,
+        Software.Devices.L1V1.Device,
+    ]
+
+    return devices
+
+
 class DeviceWrapper(object):
     """
     Class to use as a major Device.
@@ -14,21 +23,10 @@ class DeviceWrapper(object):
     """
 
     def __init__(self):
-        self._dev = Software.Devices.Dummy.Device()  # default device
+        self._dev = get_available_devices()[0]()
 
         self._log = root_logger.getChild(self.__class__.__name__)
 
-        self._avail = [  # list of all available devices
-            Software.Devices.Dummy.Device,
-            Software.Devices.L1V1.Device,
-        ]
-
-    def get_available(self):
-        """
-        :return: all available devices information
-        """
-        # TODO change API to return dict with specified parameters
-        return self._avail
 
     def __setattr__(self, name, value):
         self.__dict__[name] = value  # assigning to the dict of names in the class
@@ -55,3 +53,11 @@ class DeviceWrapper(object):
         print("My arguments are: " + str(args))
         print("My keyword arguments are: " + str(kwargs))
         # raise Warning('this method should never be called')
+
+
+class GenericDevice(object):
+    """
+    This devices doesn't do anything, it's only purpose is to provide some default values for
+    each new device, like description and such.
+    """
+    description = "generic device used to subclass other devices"
