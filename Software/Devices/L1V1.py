@@ -23,6 +23,16 @@ class TrigModes(object):
     FALL = b'\x02'
     BOTH = b'\x03'
 
+    @staticmethod
+    def get_str(mode):
+        if mode == b'\x01':
+            return 'RISE'
+        if mode == b'\x02':
+            return 'FALL'
+        if mode == b'\x03':
+            return 'BOTH'
+        raise ValueError('unknown mode')
+
 
 class Device(object):
     TRIG_MODES = TrigModes()

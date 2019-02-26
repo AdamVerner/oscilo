@@ -14,7 +14,7 @@ class DeviceWrapper(object):
     """
 
     def __init__(self):
-        self._dev = Software.Devices.L1V1.Device()  # default device
+        self._dev = Software.Devices.Dummy.Device()  # default device
 
         self._log = root_logger.getChild(self.__class__.__name__)
 

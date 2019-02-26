@@ -65,10 +65,12 @@ class Plot(Gtk.Alignment):
             """
             watches pipe and when data changes, changes the label
             """
+            print(source, condition)
             assert parent_conn.poll()
             i = parent_conn.recv()
             self.ax.clear()
             self.ax.grid(True, 'both', 'both')
+            print(i)
             print(self.ax.plot(i, **self.graph_properties))
             self.queue_draw()
             return True
