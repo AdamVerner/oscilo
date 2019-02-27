@@ -23,10 +23,10 @@ class DeviceWrapper(object):
     """
 
     def __init__(self):
-        self._dev = get_available_devices()[0]()
+        self.default_device = Software.Devices.Dummy.Device()
+        self._dev = self.default_device
 
         self._log = root_logger.getChild(self.__class__.__name__)
-
 
     def __setattr__(self, name, value):
         self.__dict__[name] = value  # assigning to the dict of names in the class
@@ -38,21 +38,29 @@ class DeviceWrapper(object):
         look through device
         """
         try:
-            return self.__getattribute__(attr)
+            return super().__getattribute__(attr)
         except AttributeError:
+            print('attr %s not found in self, looking it up in dev' % attr)
             try:
                 return self._dev.__getattribute__(attr)
             except AttributeError:
-                self._log.critical('%s requested unset atribute, returning universal handler', attr)
+                self._log.critical('%s requested unset attribute, returning universal handler',
+                                   attr)
                 return self._universal_handler
 
-    def _universal_handler(self, *args, **kwargs):
+    @staticmethod
+    def _universal_handler(*args, **kwargs):
         """
         Handle a command that was not specified anywhere
         """
         print("My arguments are: " + str(args))
         print("My keyword arguments are: " + str(kwargs))
         # raise Warning('this method should never be called')
+
+    def change_device(self, device):
+        print('changing to new device %s' % device)
+        self._dev = device()
+        return self._dev
 
 
 class GenericDevice(object):

@@ -4,18 +4,17 @@
 """
 Main class for handling communication with FPGA Board
 """
-from __future__ import absolute_import
-
 import logging
 from multiprocessing import Process
 from time import sleep
-from typing import List, Callable
-
-from serial import Serial
-
-root_logger = logging.getLogger(__name__)
+from typing import List, Callable, Union
+from serial import Serial, SerialException
+import os
 
 from Software.Devices.Exceptions import *
+from Software.Popups import task_fail
+
+root_logger = logging.getLogger(__name__)
 
 
 class TrigModes(object):
@@ -35,6 +34,14 @@ class TrigModes(object):
 
 
 class Device(object):
+    """
+    test text of long description
+    """
+
+    description = 'device used to measure voltage'
+    name = 'Osciloscope'
+    icon = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/oscilloscope.png'))
+
     TRIG_MODES = TrigModes()
 
     sample_count = 255  # maximum number of samples the device can store
@@ -58,22 +65,29 @@ class Device(object):
 
     available = False
 
-    def __init__(self, port: str = '/dev/ttyUSB0') -> None:
+    def __new__(cls, port: str = '/dev/ttyUSB0') -> object:
         """
         initializes USB serial communication port
         asserts, that the device is ready and responding.
         if there are means it should calibrate the device
         """
 
-        self.log = root_logger.getChild(self.__class__.__name__)
+        try:
+            cls._dev = Serial(port=port, baudrate=115200, timeout=1)
+            cls._dev.reset_input_buffer()
+            cls._dev.reset_output_buffer()
+            cls.available = True
+            cls.comm_test()
+            cls.log = root_logger.getChild(cls.__class__.__name__)
+            cls.log.info('device passed initial tests')
+            return cls
+        except SerialException:
+            root_logger.exception('connecting do Hardware failed, returning dummy instead, '
+                                  'dumping traceback and returning Dummy instead')
+            task_fail('Cannot open device port %s' % port, 'returning dummy device instead')
 
-        self._dev = Serial(port=port, baudrate=115200, timeout=1)
-        self._dev.reset_input_buffer()
-        self._dev.reset_output_buffer()
-        self.available = True
-
-        self.comm_test()
-        self.log.info('device passed initial tests')
+            from Software.Devices.Dummy import Device as Dev
+            return Dev()
 
     def comm_test(self) -> None:
         self.log.info('testing the device')

@@ -24,6 +24,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from Software.Modules.Scope.Module import Module as ScopeModule
+from Software.Modules.Selector.Module import Module as DeviceSelector
 
 
 class ModuleSelector(Gtk.Notebook):
@@ -36,6 +37,7 @@ class ModuleSelector(Gtk.Notebook):
         self.device = device
 
         pages = list()
+        pages.append(['DeviceSelector', DeviceSelector(self.device)])
         pages.append(['Scope', ScopeModule(self.device)])
 
         for page in pages:

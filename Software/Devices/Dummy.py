@@ -10,12 +10,24 @@ from multiprocessing import Process
 from time import sleep
 from typing import List, Callable
 from numpy import arange, sin, pi
-from random import randint, random
+from random import randint
+import os
 
 from Software.Devices.L1V1 import TrigModes
 
 
 class Device(object):
+    """
+    <span foreground="blue" size="x-large">DUMMPY DEVICE</span>
+    This device simulates all possible options, that a device can have.
+    Samples are genereated randomly as they're only for testing graph generat viewing purposes.
+    That means, that trigger options don't usally match
+    """
+
+    description = 'all interfaces available, some of them do something'
+    name = 'DUMMY'
+    icon = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/fake_news.png'))
+
     TRIG_MODES = TrigModes()
 
     sample_count = 255
@@ -59,7 +71,7 @@ class Device(object):
         self.log_data = list()  # each line is one information of device log
         # self.set_memory_to(b'\x00')
 
-    def activate_scope(self, sampling_callback: Callable, done_callback: Callable):
+    def activate_scope(self, sampling_callback: Callable=None, done_callback: Callable=None):
         """
         :param sampling_callback: function to call when the scope transitions into post_trigger
         :param done_callback:  function to call when scope is done with measurements
@@ -73,12 +85,8 @@ class Device(object):
         print(y)
 
         self._mem = y
-
-        Process(target=lambda *_: (sleep(0.2), sampling_callback())).start()
-
-        def trg(*_):
-            sleep(0.5)
-            done_callback()
-
-        Process(target=trg).start()
+        if sampling_callback:
+            Process(target=lambda *_: (sleep(0.2), sampling_callback())).start()
+        if done_callback:
+            Process(target=lambda *_: (sleep(0.4), done_callback())).start()
 

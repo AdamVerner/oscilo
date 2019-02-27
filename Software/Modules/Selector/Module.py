@@ -1,65 +1,110 @@
 # /bin/env python3
 # -*- coding: utf-8 -*-
 """
-|-----------------------------|
-| |SearchBar| |--------------||
-| |---------| |              ||
-| ||-------|| | DESCRIPTION  ||
-| ||Device || | OF           ||
-| ||-------|| | THE          ||
-| ||-------|| | DEVICE       ||
-| ||Device || |              ||
-| ||-------|| |--------------||
-|-----------------------------|
+|------------------------------------|
+| |SearchBar| |---------------------||
+| |---------| |                     ||
+| ||-------|| | DESCRIPTION         ||
+| ||Device || | OF                  ||
+| ||-------|| | THE                 ||
+| ||-------|| | DEVICE              ||
+| ||Device || |                     ||
+| ||-------|| |---------------------||
+|------------------------------------|
 """
 
 import os
 import sys
-
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gdk
 
 if __name__ == '__main__':
-    sys.path.extend([os.path.abspath('../../')])  # for running without Controller
+    sys.path.extend([os.path.abspath('../../../')])  # for running without Controller
     print(sys.path)
 
-from Software.Devices import get_available_devices
+from Software.Devices.Wrapper import get_available_devices
 
 
-class Module(Gtk.Grid):
+class Module(Gtk.HBox):
     """
-    Toplevel module for Scope view
+    Top level module for Scope view
     """
+
+    def device_selected(self, box, box_row):
+        new_dev = self.device.change_device(box_row.device)
+        self.make_selection(new_dev)
 
     def __init__(self, device):
         self.device = device
         super(Module, self).__init__()
 
+        self.box_rows = []
 
-git
-add
-self.device_list = Gtk.ListBox()
+        self.device_list = Gtk.ListBox()
+        self.device_list.connect('row-activated', self.device_selected)
+        for dev in get_available_devices():
+            row = Gtk.ListBoxRow()
+            row.device = dev
 
-for dev in get_available_devices():
-    row = Gtk.ListBoxRow()
-    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
-    row.add(hbox)
-    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-    hbox.pack_start(vbox, True, True, 0)
+            row.text_buffer = Gtk.TextBuffer()
+            row.text_buffer.set_text(dev.__doc__)
 
-    label1 = Gtk.Label("Automatic Data & Time", xalign=0)
-    label2 = Gtk.Label("Requires internet access", xalign=0)
-    vbox.pack_start(label1, True, True, 0)
-    vbox.pack_start(label2, True, True, 0)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(dev.icon, 64, 64, True)
+            icon = Gtk.Image.new_from_pixbuf(pixbuf)
+            icon_wrap = Gtk.Box(spacing=50)
+            icon_wrap.pack_start(icon, True, True, 0)
 
-    switch = Gtk.Switch()
-    switch.props.valign = Gtk.Align.CENTER
-    hbox.pack_start(switch, False, True, 0)
-    self.device_list.add(row)
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
 
-self.attach(self.device_list, 0, 0, 1, 1)
+            vbox = Gtk.VBox(spacing=5)
+            vbox.pack_start(hbox, True, True, 0)
+            vbox.pack_start(Gtk.Separator(), True, True, 0)
+
+            row.add(vbox)
+            self.box_rows.append(row)
+
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            hbox.pack_start(vbox, True, True, 0)
+
+            label1 = Gtk.Label('<span size=\'25000\'>' + dev.name + '</span>', xalign=0)
+            label1.set_use_markup(True)
+            label2 = Gtk.Label(dev.description, xalign=0)
+
+            vbox.pack_start(label1, True, True, 0)
+            vbox.pack_start(label2, True, True, 0)
+
+            hbox.pack_start(icon_wrap, False, True, 0)
+            self.device_list.add(row)
+
+        self.pack_start(self.device_list, False, False, 0)
+        self.pack_start(Gtk.Separator(), False, False, 0)
+        self.text_view = Gtk.TextView(  accepts_tab=True, editable=False, cursor_visible=False)
+        self.pack_start(self.text_view, True, True, 0)
+
+    def make_selection(self, device):
+        """
+        receives device, tries to find in in device list, then select the one tab containing the
+        device
+        this is usefull, when device selection fails, and DUMMY is used as default it gets selected
+        """
+        # range through all devices, select the one;
+        self.device_list.unselect_all()
+        for row in self.box_rows:
+            if isinstance(device, row.device):
+
+                buffer = self.text_view.get_buffer()
+                start = buffer.get_start_iter()
+                end = buffer.get_end_iter()
+                buffer.delete(start, end)
+
+                buffer.insert_markup(start, row.device.__doc__, len(row.device.__doc__))
+
+                self.device_list.select_row(row)
+                break
+
 
 if __name__ == '__main__':
     from Software.TestUtil import test_util

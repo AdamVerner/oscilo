@@ -307,7 +307,7 @@ class Control(Gtk.Grid):
         auto_pull_lbl = Gtk.Label('Auto pull')
 
         ctrl_btn.connect('pressed', self.ctrl_begin_callback)
-        pull_btn.connect('pressed', lambda _: self.push_func(self.device.get_samples()))
+        pull_btn.connect('pressed', lambda *_: self.push_func(self.device.get_samples()))
 
         self.attach(label, 0, 0, 2, 1)
         self.attach(ctrl_btn, 0, 1, 2, 1)
