@@ -28,12 +28,14 @@ class Device(object):
     name = 'DUMMY'
     icon = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/fake_news.png'))
 
+    HAS_VERTICAL = False
+
     TRIG_MODES = TrigModes()
 
     sample_count = 255
 
-    trig_max = 255
-    trig_min = 0
+    trig_max = 127
+    trig_min = -127
     trig_step: 1
 
     _trig_mode = TRIG_MODES.RISE
@@ -47,7 +49,6 @@ class Device(object):
         self._mem = word * self.sample_count
 
     def get_samples(self) -> List[int]:
-        print('returning samples', self._mem)
         return [int(x) for x in self._mem]
 
     get_sample_offset = lambda: 0
@@ -79,10 +80,7 @@ class Device(object):
 
         x = arange(self.sample_count)  # the points on the x axis for plotting
         # compute the value (amplitude) of the sin wave at the for each sample
-        y = [sin(4 * pi * (i / self.sample_count))*randint(215, 220) * randint(10,
-                                                                                        30) for i
-             in x]
-        print(y)
+        y = [sin(4 * pi * (i / self.sample_count))* 200 + randint(0, 25) for i in x]
 
         self._mem = y
         if sampling_callback:

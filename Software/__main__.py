@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 from Software.MainWindow import MainWindow
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     os.environ['NO_AT_BRIDGE'] = '1'
     MainWindow()
     Gtk.main()

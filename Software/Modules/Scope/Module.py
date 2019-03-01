@@ -31,9 +31,9 @@ class Module(Gtk.Grid):
         self.device = device
         super(Module, self).__init__()
 
-        self.plot = Plot()
+        self.plot = Plot(self.device)
         self.settings = Settings(self.device)
-        self.signals = Signals()
+        self.signals =  Signals()
 
         self.settings.control.push_func = self.plot.update
 

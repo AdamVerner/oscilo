@@ -33,6 +33,9 @@ class Signals(Gtk.Grid):
 
     def __init__(self):
         super(Signals, self).__init__()
+        l = Gtk.Label('testLabel')
+        self.attach(l, 0, 0, 1, 1)
+
 
 
 if __name__ == '__main__':

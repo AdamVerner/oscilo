@@ -42,6 +42,8 @@ class Device(object):
     name = 'Osciloscope'
     icon = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/oscilloscope.png'))
 
+    HAS_VERTICAL = True
+
     TRIG_MODES = TrigModes()
 
     sample_count = 255  # maximum number of samples the device can store

@@ -42,8 +42,7 @@ class Settings(Gtk.Grid):
         self.size = (800, 400)
 
         self.trigger = Trigger(self.device)
-        # self.vertical = Vertical(self.device)
-        self.vertical = Gtk.Label('')
+        self.vertical = Vertical(self.device)
         self.horizontal = Horizontal(self.device)
         self.filtering = Filters()
         self.control = Control(self.device)
@@ -156,6 +155,13 @@ class Vertical(Gtk.Grid):
         super(Vertical, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'VERTICAL MENU' + LABEL_END, **LABEL_PROPS)
+        self.attach(label, 0, 0, 3, 1)
+
+        if not self.device.HAS_VERTICAL:
+            not_implemented_label = Gtk.Label('Device dosn\'t support this option')
+            self.attach(not_implemented_label, 0, 1, 3, 1)
+            return
+
 
         vga_label = Gtk.Label('GAIN')
         att_label = Gtk.Label('ATT')
@@ -209,8 +215,6 @@ class Vertical(Gtk.Grid):
         att_scale.set_inverted(True)
         att_scale.set_round_digits(0)
 
-        self.attach(label, 0, 0, 3, 1)
-
         self.attach(vga_label, 0, 1, 1, 1)
         self.attach(att_label, 1, 1, 1, 1)
         self.attach(off_label, 2, 1, 1, 1)
@@ -251,7 +255,7 @@ class Horizontal(Gtk.Grid):
         sps_adjust = Gtk.Adjustment(100, 0, 255, 1, 1, 1)
         sps_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, sps_adjust)
         sps_scale.set_size_request(-1, -1)
-        sps_scale.set_inverted(True)
+        sps_scale.set_inverted(False)
         sps_scale.set_round_digits(0)
 
         sps_spin = Gtk.SpinButton()
@@ -265,7 +269,7 @@ class Horizontal(Gtk.Grid):
 
         self.attach(label, 0, 0, 1, 1)
         self.attach(el, 0, 1, 1, 1)
-        self.attach(sps_spin, 0, 2, 1, 1)
+        # self.attach(sps_spin, 0, 2, 1, 1)
         self.attach(sps_scale, 0, 3, 1, 1)
         self.attach(sps_set, 0, 4, 1, 1)
 
@@ -293,7 +297,7 @@ class Control(Gtk.Grid):
     only for get_samples button for now
     """
 
-    push_func = None  # function to call when automatic sample collection is wanted
+    push_func = print  # function to call when automatic sample collection is wanted
 
     def __init__(self, device: Device):
         super(Control, self).__init__()
@@ -307,7 +311,7 @@ class Control(Gtk.Grid):
         auto_pull_lbl = Gtk.Label('Auto pull')
 
         ctrl_btn.connect('pressed', self.ctrl_begin_callback)
-        pull_btn.connect('pressed', lambda *_: self.push_func(self.device.get_samples()))
+        pull_btn.connect('pressed', self.push_func)
 
         self.attach(label, 0, 0, 2, 1)
         self.attach(ctrl_btn, 0, 1, 2, 1)
@@ -348,7 +352,7 @@ class Control(Gtk.Grid):
         # plot values if the option is enabled
         if self.auto_pull.get_active() and self.push_func:
             print('pushing samples to graph')
-            self.push_func(self.device.get_samples())
+            self.push_func()  #(self.device.get_samples(), self.device.get_trig_lvl())
 
     def ctrl_begin_callback(self, *_):
         self.child_conn.send("<span color='#999910'>ACTIVE</span>")
