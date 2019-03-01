@@ -252,26 +252,30 @@ class Horizontal(Gtk.Grid):
 
         el = Gtk.Label()
 
-        sps_adjust = Gtk.Adjustment(100, 0, 255, 1, 1, 1)
+        sps_adjust = Gtk.Adjustment(self.device.get_trig_place(), 0, 1.1, 0.1, 0.1, 0.1)
         sps_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, sps_adjust)
         sps_scale.set_size_request(-1, -1)
         sps_scale.set_inverted(False)
-        sps_scale.set_round_digits(0)
-
-        sps_spin = Gtk.SpinButton()
+        sps_scale.set_digits(1)
+        sps_scale.set_draw_value(False)
 
         def set_sps(_):
-            self.device.trig_lvl = sps_scale.get_value()
-            pass
+            self.device.set_trig_place(sps_scale.get_value())
+
+        def changed(adjust):
+            el.set_label("{0:.2f}".format(adjust.get_value()) + '%')
+
+        changed(sps_adjust)  # trigger once, so the default value gets overwritten
+
+        sps_adjust.connect('value-changed', changed)
 
         sps_set = Gtk.Button('SET')
         sps_set.connect('pressed', set_sps)
 
         self.attach(label, 0, 0, 1, 1)
         self.attach(el, 0, 1, 1, 1)
-        # self.attach(sps_spin, 0, 2, 1, 1)
-        self.attach(sps_scale, 0, 3, 1, 1)
-        self.attach(sps_set, 0, 4, 1, 1)
+        self.attach(sps_scale, 0, 2, 1, 1)
+        self.attach(sps_set, 0, 3, 1, 1)
 
 
 class Filters(Gtk.Grid):
@@ -297,7 +301,11 @@ class Control(Gtk.Grid):
     only for get_samples button for now
     """
 
-    push_func = print  # function to call when automatic sample collection is wanted
+    push_func = None  # function to call when automatic sample collection is wanted
+
+    def push_wrap(self, *_):
+        if self.push_func:
+            self.push_func()
 
     def __init__(self, device: Device):
         super(Control, self).__init__()
@@ -311,7 +319,7 @@ class Control(Gtk.Grid):
         auto_pull_lbl = Gtk.Label('Auto pull')
 
         ctrl_btn.connect('pressed', self.ctrl_begin_callback)
-        pull_btn.connect('pressed', self.push_func)
+        pull_btn.connect('pressed', self.push_wrap)
 
         self.attach(label, 0, 0, 2, 1)
         self.attach(ctrl_btn, 0, 1, 2, 1)
@@ -352,7 +360,7 @@ class Control(Gtk.Grid):
         # plot values if the option is enabled
         if self.auto_pull.get_active() and self.push_func:
             print('pushing samples to graph')
-            self.push_func()  #(self.device.get_samples(), self.device.get_trig_lvl())
+            self.push_func()
 
     def ctrl_begin_callback(self, *_):
         self.child_conn.send("<span color='#999910'>ACTIVE</span>")

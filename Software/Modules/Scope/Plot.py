@@ -18,11 +18,9 @@
 |----------------------------------------------------------|
 """
 
-from typing import Union
 import logging
 
 logger = logging.getLogger(__name__)
-
 from matplotlib.figure import Figure
 
 try:
@@ -45,24 +43,24 @@ class Plot(Gtk.Alignment):
     graph_properties = {
         'linestyle': '-',
         'marker': '',
+        'color': 'green'
     }
 
     def __init__(self, device):
-        Gtk.Box.__init__(self)
+        super(Plot, self).__init__()
         self.device = device
         self.set_hexpand(True)
         self.set_vexpand(True)
 
         fig = Figure()
+        fig.subplots_adjust(top=1, bottom=0.09, right=1, left=0.065,
+                            hspace=0.2, wspace=0.2)
 
         self.ax = fig.add_subplot(111, fc='black')
-
-        self.ax.grid(True, 'both', 'both')
-
-        self.ax.set_xlabel('Time [S]')
-        self.ax.set_ylabel('Amplitude [V]')
+        self._def_axis(self.ax)
 
         canvas = FigureCanvas(fig)
+
         canvas.set_size_request(600, 600)
         self.add(canvas)
 
@@ -72,22 +70,23 @@ class Plot(Gtk.Alignment):
             """
             watches pipe and when data changes, changes the label
             """
-            print(source, condition)
+            print('source = ', source, 'condition = ', condition)
             assert parent_conn.poll()
             data = parent_conn.recv()
 
-            logging.debug(data.keys(), data['trig_low'], data['trig_up'],  len(data['values']))
+            samples = data['values']
 
-            self.ax.clear()
-            self.ax.grid(True, 'both', 'both')
-            self.ax.plot(data['values'], **self.graph_properties)
+            logging.debug(data.keys(), data['trig_low'], data['trig_up'], len(samples))
+
+            self._def_axis(self.ax)
+            self.ax.plot(samples, **self.graph_properties)
 
             if data['trig_low'] is not None:
-                trig_low = [data['trig_low'] for _ in range(len(data['values']))]
-                self.ax.plot(trig_low)
+                self.ax.axhline(y=data['trig_low'], color='b', linestyle=':')
             if data['trig_up'] is not None:
-                trig_up = [data['trig_up'] for _ in range(len(data['values']))]
-                self.ax.plot(trig_up)
+                self.ax.axhline(y=data['trig_up'], color='b', linestyle=':')
+
+            self.ax.axvline(x=self.device.get_trig_place() * len(samples), color='r', linestyle=':')
 
             self.queue_draw()
             return True
@@ -103,6 +102,19 @@ class Plot(Gtk.Alignment):
             'trig_up': self.device.get_trig_lvl()
         }
         self.child_conn.send(data)
+
+    @staticmethod
+    def _def_axis(ax):
+
+        ax.clear()
+        ax.grid(True, 'both', 'both')
+        ax.set_xlabel('Time [S]')
+        ax.set_ylabel('Amplitude [V]')
+        ax.margins(tight=True)
+
+    def redraw(self):
+        self.update()
+
 
 
 if __name__ == '__main__':

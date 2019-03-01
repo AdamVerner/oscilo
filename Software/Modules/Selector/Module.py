@@ -15,11 +15,11 @@
 
 import os
 import sys
+
 import gi
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
-from gi.repository import Gdk
 
 if __name__ == '__main__':
     sys.path.extend([os.path.abspath('../../../')])  # for running without Controller
@@ -81,7 +81,7 @@ class Module(Gtk.HBox):
 
         self.pack_start(self.device_list, False, False, 0)
         self.pack_start(Gtk.Separator(), False, False, 0)
-        self.text_view = Gtk.TextView(  accepts_tab=True, editable=False, cursor_visible=False)
+        self.text_view = Gtk.TextView(accepts_tab=True, editable=False, cursor_visible=False)
         self.pack_start(self.text_view, True, True, 0)
 
     def make_selection(self, device):
@@ -99,11 +99,16 @@ class Module(Gtk.HBox):
                 start = buffer.get_start_iter()
                 end = buffer.get_end_iter()
                 buffer.delete(start, end)
-
                 buffer.insert_markup(start, row.device.__doc__, len(row.device.__doc__))
 
                 self.device_list.select_row(row)
                 break
+
+    def redraw(self):
+        """This page should be static, so there is no need to redraw anything"""
+        # self.__init__(self.device)
+        # self.make_selection(self.device)
+
 
 
 if __name__ == '__main__':

@@ -33,13 +33,18 @@ class Module(Gtk.Grid):
 
         self.plot = Plot(self.device)
         self.settings = Settings(self.device)
-        self.signals =  Signals()
+        self.signals = Signals()
 
         self.settings.control.push_func = self.plot.update
 
         self.attach(self.plot, 0, 0, 1, 1)
-        self.attach(self.settings, 0, 1, 1, 1)
-        self.attach(self.signals, 1, 0, 1, 2)
+        self.attach(self.signals, 1, 0, 1, 1)
+        self.attach(self.settings, 0, 1, 2, 1)
+
+    def redraw(self):
+        self.plot.redraw()
+        self.settings.redraw()
+        self.signals.redraw()
 
 
 if __name__ == '__main__':

@@ -36,15 +36,20 @@ class ModuleSelector(Gtk.Notebook):
         super(ModuleSelector, self).__init__()
         self.device = device
 
-        pages = list()
-        pages.append(['DeviceSelector', DeviceSelector(self.device)])
-        pages.append(['Scope', ScopeModule(self.device)])
+        self.pages = list()
+        self.pages.append(['Scope', ScopeModule(self.device)])
+        self.pages.append(['DeviceSelector', DeviceSelector(self.device)])
 
-        for page in pages:
+        for page in self.pages:
             # label = Gtk.Label()
             self.append_page(page[1], Gtk.Label(page[0]))
 
         self.show_all()
+        self.connect('switch-page', self.change_page)
+
+    def change_page(self, selector, module, page_num):
+        # assume that page order didn't diviate from page list
+        self.pages[page_num][1].redraw()
 
 
 if __name__ == '__main__':

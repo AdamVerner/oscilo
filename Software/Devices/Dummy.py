@@ -6,19 +6,20 @@ dummy fpga for testing and development of user app
 always replies with same waveforms and so on....
 """
 
+import os
 from multiprocessing import Process
+from random import randint
 from time import sleep
 from typing import List, Callable
+
 from numpy import arange, sin, pi
-from random import randint
-import os
 
 from Software.Devices.L1V1 import TrigModes
 
 
 class Device(object):
     """
-    <span foreground="blue" size="x-large">DUMMPY DEVICE</span>
+    <span foreground="blue" size="x-large">DUMMY DEVICE</span>
     This device simulates all possible options, that a device can have.
     Samples are genereated randomly as they're only for testing graph generat viewing purposes.
     That means, that trigger options don't usally match
@@ -36,11 +37,12 @@ class Device(object):
 
     trig_max = 127
     trig_min = -127
-    trig_step: 1
+    trig_step = 1
 
     _trig_mode = TRIG_MODES.RISE
     _mem = b'\x10' * sample_count
     _trigger_level = 0x80
+    _trig_place = 0.5
 
     def destroy(self) -> None:
         pass
@@ -68,11 +70,17 @@ class Device(object):
     def set_bound(self, upper: int, lower: int) -> None:
         pass
 
+    def get_trig_place(self) -> float:
+        return self._trig_place  # 50% default
+
+    def set_trig_place(self, value: float) -> None:
+        self._trig_place = value
+
     def __init__(self, *_, **__):
         self.log_data = list()  # each line is one information of device log
         # self.set_memory_to(b'\x00')
 
-    def activate_scope(self, sampling_callback: Callable=None, done_callback: Callable=None):
+    def activate_scope(self, sampling_callback: Callable = None, done_callback: Callable = None):
         """
         :param sampling_callback: function to call when the scope transitions into post_trigger
         :param done_callback:  function to call when scope is done with measurements
