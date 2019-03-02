@@ -34,8 +34,8 @@ class Module(Gtk.HBox):
     """
 
     def device_selected(self, box, box_row):
-        new_dev = self.device.change_device(box_row.device)
-        self.make_selection(new_dev)
+        self.device.change_device(box_row.device)
+        self.make_selection(box_row.device)
 
     def __init__(self, device):
         self.device = device
@@ -93,7 +93,7 @@ class Module(Gtk.HBox):
         # range through all devices, select the one;
         self.device_list.unselect_all()
         for row in self.box_rows:
-            if isinstance(device, row.device):
+            if device is row.device:
 
                 buffer = self.text_view.get_buffer()
                 start = buffer.get_start_iter()

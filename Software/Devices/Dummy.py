@@ -44,6 +44,9 @@ class Device(object):
     _trigger_level = 0x80
     _trig_place = 0.5
 
+    def __init__(self):
+        pass
+
     def destroy(self) -> None:
         pass
 

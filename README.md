@@ -14,3 +14,6 @@ Verilog vs VHDL
 modular design application
 
 
+
+#### firmware
+here is the fpga project with all it's files and sources

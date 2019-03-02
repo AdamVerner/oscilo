@@ -67,7 +67,7 @@ class Device(object):
 
     available = False
 
-    def __new__(cls, port: str = '/dev/ttyUSB0') -> object:
+    def __new__(cls, port: str = '/dev/ttyUSB2') -> object:
         """
         initializes USB serial communication port
         asserts, that the device is ready and responding.
@@ -75,14 +75,15 @@ class Device(object):
         """
 
         try:
-            cls._dev = Serial(port=port, baudrate=115200, timeout=1)
-            cls._dev.reset_input_buffer()
-            cls._dev.reset_output_buffer()
-            cls.available = True
-            cls.comm_test()
-            cls.log = root_logger.getChild(cls.__class__.__name__)
-            cls.log.info('device passed initial tests')
-            return cls
+            instance = super().__new__(cls)
+            instance.log = root_logger.getChild(cls.__class__.__name__)
+            instance._dev = Serial(port=port, baudrate=115200, timeout=1)
+            instance._dev.reset_input_buffer()
+            instance._dev.reset_output_buffer()
+            instance.available = True
+            instance.comm_test()
+            instance.log.info('device passed initial tests')
+            return instance
         except SerialException:
             root_logger.exception('connecting do Hardware failed, returning dummy instead, '
                                   'dumping traceback and returning Dummy instead')
@@ -91,16 +92,18 @@ class Device(object):
             from Software.Devices.Dummy import Device as Dev
             return Dev()
 
+    def __init__(self):
+        pass
+
     def comm_test(self) -> None:
         self.log.info('testing the device')
 
-        expected = b''.join([chr(number).encode('utf-8') for number in range(0, 42, 1)])
+        expected = b''.join([chr(number).encode('utf-8') for number in range(0, 0x05, 1)])
         self.log.debug('received data should be %s ', expected)
 
         self._dev.write(self._REPLY_CNT)  # select module
-        self._dev.write(b'\x2a')  # 2a = dec(42)
-        sleep(3.2)
-        data = self._dev.read(0x2a)
+        self._dev.write(b'\x05')  # 2a = dec(42)
+        data = self._dev.read(0x05)
         self.log.debug('received data from device %s', data)
 
         if data != expected:

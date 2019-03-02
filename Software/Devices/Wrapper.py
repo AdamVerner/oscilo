@@ -60,6 +60,7 @@ class DeviceWrapper(object):
     def change_device(self, device):
         print('changing to new device %s' % device)
         self._dev = device()
+        print('changed to ', self._dev)
         return self._dev
 
 
