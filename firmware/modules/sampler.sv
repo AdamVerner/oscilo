@@ -1,10 +1,9 @@
 /*
-*   statemodule
-*   the hearth of the whole osciloscope
-*   TODO shift the memory, so the first sample is on the first place in
-*   memmory
-*   TODO more advanced trigger logic (external module)
-*/
+ * module, that provides sampling logic to the osciloscope
+ * can be force-triggered by seinding 0x55 during pre-trigger state
+ * after receiving all memmory the device transimts 0x55 signal
+ *
+ */
 
 module sampler(
     input                     clk_50mhz,
@@ -24,8 +23,14 @@ module sampler(
 
     input                     trig,
     output                    trig_reset = 1,
-
     input                     force_trig,
+
+    input                     rx_ready,
+    input  [7:0]              rx_data,
+
+    input                     tx_active,
+    output                    tx_start = 0,
+    output [7:0]              tx_data = 8'h55,
 
     input  [15:0]             clk_div
     );
@@ -40,13 +45,26 @@ module sampler(
         .out_clk(std_clk)
     );
 
-    assign g = std_clk;
-
     wire [SAMPLE_DEPTH-1:0] remaining_samples;
     wire                    activate_adc_clk;
     wire                    activate_mem_clk;
 
     wire [3:0]              sampler_state;
+
+    reg received;
+    reg watch_trig = 0;
+    reg [7:0] rec_data;
+
+    always @(posedge rx_ready, negedge watch_trig) begin
+        if (~watch_trig)
+            received <= 0;
+        else
+        if (rx_ready) begin
+            received <= 1;
+            rec_data <= rx_data;
+        end
+
+    end
 
     parameter ST_IDLE = 0;
     parameter ST_SETUP = 1;
@@ -54,14 +72,13 @@ module sampler(
     parameter ST_PRE_TRIG = 3;
     parameter ST_POST_TRIG = 4;
     parameter ST_SHIFT = 5;
-    parameter ST_CLEAR = 6;
+    parameter ST_SIGNAL = 6;
+    parameter ST_CLEAR = 7;
 
 
         // activate output adc only when activated
     assign adc_clk = std_clk && activate_adc_clk;
     assign mem_clk = std_clk && activate_mem_clk;
-
-
 
         /* TODO add clk_divided*/
 
@@ -99,7 +116,8 @@ module sampler(
                     trig_reset = 0;
                     mem_addr = mem_addr+1;
                     mem_data = adc_data;
-                    if (trig || force_trig)
+                    watch_trig = 1;
+                    if (trig || force_trig || (received && (rec_data == 8'h55)))
                         begin
                             sampler_state = ST_POST_TRIG;
                             offset = mem_addr;
@@ -115,16 +133,25 @@ module sampler(
                             sampler_state = ST_SHIFT;
                     end
                 ST_SHIFT:
-                    sampler_state = ST_CLEAR;
+                    sampler_state = ST_SIGNAL;
                 /* TODO shift samples */
+                ST_SIGNAL: begin
+                    tx_data = 8'h55;
+                    if (~tx_active) begin
+                        tx_start = 1;
+                        sampler_state = ST_CLEAR;
+                    end
+                end
                 ST_CLEAR:
                     begin
                         activate_adc_clk = 0;
                         activate_mem_clk = 0;
                         mem_we = 0;  // enable writing into memory
                         done = 1;
+                        tx_start = 0;
+                        watch_trig = 0;
 
-                        if (~activate)
+                        if (~activate && ~tx_active)
                             sampler_state = ST_IDLE;
                     end
 

@@ -1,5 +1,5 @@
 /*
- *  1. byte = mode ( 1 = rise, 2 = fall, 3 = both, else rise )
+ *  1. byte = mode ( 1 = rise, 2 = fall, 3 = both, 4 = none, else rise )
  *  2. byte = lower_bound
  *  3. byte = upper_bound
  *
@@ -58,6 +58,9 @@ module trig_config(
                     else if (rx_data == 3) begin
                         en_rise = 1;
                         en_fall = 1;
+                    end else if (rx_data == 4) begin
+                        en_rise = 0;
+                        en_fall = 0;
                     end
                     else begin
                         en_rise = 1;

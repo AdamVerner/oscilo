@@ -118,7 +118,7 @@ module main(
         .en_rise(en_rise),
         .en_fall(en_fall)
     );
-    wire trig_rst, trig;
+    wire                    trig_rst, trig;
     trigger #(.WIDTH(8)) trigger_instance(
         .rst(KEY4),
         .clk(adc_clk),   // wire it parallel to sampler
@@ -137,14 +137,16 @@ module main(
     // sampler_instance start
     assign LED_GREEN = sampler_activate;
     assign LED_RED = sampler_done;
-    wire       sampler_activate, sampler_done;
-    wire [7:0] adc_data;
-    wire       adc_clk;
-    wire [7:0] sampler_data_in;
-    wire       sampler_we;
-    wire       sampler_clk;
+    wire                    sampler_activate, sampler_done;
+    wire [7:0]              adc_data;
+    wire                    adc_clk;
+    wire [7:0]              sampler_data_in;
+    wire                    sampler_we;
+    wire                    sampler_clk;
     wire [SAMPLE_DEPTH-1:0] sampler_addr_in;
     wire [SAMPLE_DEPTH-1:0] offset;
+    wire [7:0]              sampler_tx_data;
+    wire                    sampler_tx_start;
     sampler #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sampler_instance(
         .clk_50mhz (CLK),
         .reset     (KEY4),
@@ -160,10 +162,15 @@ module main(
         .force_trig(~KEY3),
         .trig      (trig),
         .trig_reset(trig_rst),
-        .clk_div   (clk_division)
+        .clk_div   (clk_division),
+        .tx_active (tx_active),
+        .tx_data   (sampler_tx_data),
+        .tx_start  (sampler_tx_start),
+        .rx_data   (rx_data),
+        .rx_ready  (rx_ready)
     );
-    wire clk_cfg_activate, clk_cfg_done;
-    wire [15:0] clk_division;
+    wire                    clk_cfg_activate, clk_cfg_done;
+    wire [15:0]             clk_division;
     sample_clock_config sample_clock_config_instance(
         .clk     (CLK),
         .rst     (KEY4),
@@ -177,10 +184,10 @@ module main(
 
 
     // sample_reader_instance start
-    wire       sample_reader_activate, sample_reader_done;
-    wire [7:0] sampler_reader_tx_data;
-    wire       sampler_reader_tx_start;
-    wire       sample_reader_oe;
+    wire                    sample_reader_activate, sample_reader_done;
+    wire [7:0]              sampler_reader_tx_data;
+    wire                    sampler_reader_tx_start;
+    wire                    sample_reader_oe;
     wire [SAMPLE_DEPTH-1:0] sample_reader_addr_out;
     sample_reader #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sample_reader_instace(
         .clk_50mhz(CLK),
@@ -316,6 +323,9 @@ module main(
             end else if (sample_offset_activate) begin
                 tx_data = sample_offset_tx_data;
                 tx_start = sample_offset_tx_start;
+            end else if (sampler_activate) begin
+                tx_data = sampler_tx_data;
+                tx_start = sampler_tx_start;
             end else
                 tx_start = 0;
         end
