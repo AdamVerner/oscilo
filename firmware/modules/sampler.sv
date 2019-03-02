@@ -7,39 +7,40 @@
 */
 
 module sampler(
-    input        clk_50mhz,
-                 reset,
+    input                     clk_50mhz,
+                              reset,
 
-    input        activate, // drive to 1 to activate the module
-    output       done = 0,    // signals that the module has done what it needed to do
+    input                     activate, // drive to 1 to activate the module
+    output                    done = 0,    // signals that the module has done what it needed to do
 
-    output       adc_clk,
-    input  [7:0] adc_data,
+    output                    adc_clk,
+    input  [7:0]              adc_data,
 
-    output       mem_clk,
-    output [7:0] mem_data,
-    output       mem_we,
+    output                    mem_clk,
+    output [7:0]              mem_data,
+    output                    mem_we,
     output [SAMPLE_DEPTH-1:0] mem_addr,
     output [SAMPLE_DEPTH-1:0] offset,
 
-    input trig,
-    output trig_reset = 1,
+    input                     trig,
+    output                    trig_reset = 1,
 
-    input force_trig
+    input                     force_trig,
 
+    input  [15:0]             clk_div
     );
 
     parameter SAMPLE_DEPTH = 8; // 256 samples
 
+
     wire std_clk;
-    reg [15:0] clk_cnt = 0;
+    divider std_clock_divider(
+        .clk    (clk_50mhz),
+        .count  (clk_div),
+        .out_clk(std_clk)
+    );
 
-    assign std_clk = clk_cnt[15];
-
-    always @(posedge clk_50mhz) begin
-        clk_cnt += 1;
-    end
-
+    assign g = std_clk;
 
     wire [SAMPLE_DEPTH-1:0] remaining_samples;
     wire                    activate_adc_clk;

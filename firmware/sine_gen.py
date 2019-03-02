@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import numpy as np
 import re
+
+import numpy as np
 
 main_file = open('main.sv').read()
 match = re.search(r'parameter SAMPLE_DEPTH = (\d+);', main_file, re.U)
@@ -9,7 +10,7 @@ sample_depth = int(match.group(1))
 
 print('SAMPLE_DEPTH = ', sample_depth, 'bits')
 
-t = np.arange(0, 2**sample_depth-1, 1).astype(int)
+t = np.arange(0, 2 ** sample_depth, 1).astype(int)
 s = (128 + np.sin(np.pi * t / (2**(sample_depth-4))) * 127).astype(int)
 print('minval =', s.min())
 print('maxval =', s.max())

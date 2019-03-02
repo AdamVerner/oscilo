@@ -146,20 +146,32 @@ module main(
     wire [SAMPLE_DEPTH-1:0] sampler_addr_in;
     wire [SAMPLE_DEPTH-1:0] offset;
     sampler #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sampler_instance(
-        .clk_50mhz(CLK),
-        .reset    (KEY4),
-        .activate (sampler_activate),
-        .done     (sampler_done),
-        .adc_clk  (adc_clk),
-        .adc_data (adc_data),
-        .mem_data (sampler_data_in),
-        .mem_addr (sampler_addr_in),
-        .mem_we   (sampler_we),
-        .mem_clk  (sampler_clk),
-        .offset   (offset),
+        .clk_50mhz (CLK),
+        .reset     (KEY4),
+        .activate  (sampler_activate),
+        .done      (sampler_done),
+        .adc_clk   (adc_clk),
+        .adc_data  (adc_data),
+        .mem_data  (sampler_data_in),
+        .mem_addr  (sampler_addr_in),
+        .mem_we    (sampler_we),
+        .mem_clk   (sampler_clk),
+        .offset    (offset),
         .force_trig(~KEY3),
-        .trig(trig),
-        .trig_reset(trig_rst)
+        .trig      (trig),
+        .trig_reset(trig_rst),
+        .clk_div   (clk_division)
+    );
+    wire clk_cfg_activate, clk_cfg_done;
+    wire [15:0] clk_division;
+    sample_clock_config sample_clock_config_instance(
+        .clk     (CLK),
+        .rst     (KEY4),
+        .activate(clk_cfg_activate),
+        .done    (clk_cfg_done),
+        .rx_data (rx_data),
+        .rx_ready(rx_ready),
+        .clk_div (clk_division)
     );
     // sampler_instance stop
 
@@ -191,8 +203,12 @@ module main(
         wire [7:0] first_adc_data;
         fake_adc #(
             .WIDTH(8),
-            .INC(2),
-            .DEC(2)) first_fake( .clk(first_adc_clk), .rst(KEY4), .data_out(first_adc_data) );
+            .INC(1),
+            .DEC(1)) first_fake(
+            .clk     (CLK),
+            .rst     (KEY4),
+            .data_out(first_adc_data)
+        );
         // second ADC
         wire       second_adc_clk;
         wire [7:0] second_adc_data;
@@ -205,25 +221,29 @@ module main(
         wire [7:0] third_adc_data;
         fake_adc #(
             .WIDTH(8),
-            .INC(25),
-            .DEC(255)) third_fake( .clk(third_adc_clk), .rst(KEY4), .data_out(third_adc_data) );
+            .INC(1),
+            .DEC(1)) third_fake(
+            .clk     (third_adc_clk),
+            .rst     (KEY4),
+            .data_out(third_adc_data)
+        );
 
     wire selector_done, selector_activate;
     adc_selector adc_selector_instance(
-        .clk(CLK),
-        .rst(KEY4),
-        .activate(selector_activate),
-        .done(selector_done),
-        .rx_data(rx_data),
-        .rx_ready(rx_ready),
+        .clk      (CLK),
+        .rst      (KEY4),
+        .activate (selector_activate),
+        .done     (selector_done),
+        .rx_data  (rx_data),
+        .rx_ready (rx_ready),
         .adc1_data(first_adc_data),
-        .adc1_clk(first_adc_clk),
+        .adc1_clk (first_adc_clk),
         .adc2_data(second_adc_data),
-        .adc2_clk(second_adc_clk),
+        .adc2_clk (second_adc_clk),
         .adc3_data(third_adc_data),
-        .adc3_clk(third_adc_clk),
-        .adc_data(adc_data),
-        .adc_clk(adc_clk)
+        .adc3_clk (third_adc_clk),
+        .adc_data (adc_data),
+        .adc_clk  (adc_clk),
     );
     // adc selector stop
 
@@ -326,6 +346,7 @@ module main(
     parameter ST_ADC_SELECTOR = 8'h25;
 
     parameter ST_TRIG_CONFIG = 8'h31;
+    parameter ST_CLK_CFG = 8'h32;
 
     parameter ST_REPLAYER = 8'h71;
     parameter ST_REPLY_CNT = 8'h72;
@@ -353,6 +374,7 @@ module main(
                 ST_OFFSET_GETTER: sample_offset_activate = 1;
                 ST_ADC_SELECTOR: selector_activate = 1;
                 ST_TRIG_CONFIG: trig_config_activate = 1;
+                ST_CLK_CFG: clk_cfg_activate = 1;
 
                 ST_INIT:
                     if(rx_ready)
@@ -368,6 +390,7 @@ module main(
                     sample_offset_activate = 0;
                     selector_activate = 0;
                     trig_config_activate = 0;
+                    clk_cfg_activate = 0;
 
                     if(~rx_ready && ~tx_active)
                     state = ST_INIT;
@@ -397,6 +420,10 @@ module main(
 
             if (trig_config_activate && trig_config_done)
                 state = ST_READY;
+
+            if (clk_cfg_activate && clk_cfg_done)
+                state = ST_READY;
+
 
         end
 

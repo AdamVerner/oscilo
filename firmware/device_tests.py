@@ -1,10 +1,11 @@
 #!/usr/bin/env/ python3
 # -*- coding: utf-8 -*-
 
-from serial import Serial
-from time import sleep
-import unittest
 import logging
+import unittest
+from time import sleep
+
+from serial import Serial
 
 """
 some tests to run on final device
@@ -17,10 +18,11 @@ class MainTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.log.setLevel(logging.DEBUG)
-        cls.serial_device = Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=1)
+        cls.serial_device = Serial(port='/dev/ttyUSB1', baudrate=115200, timeout=1)
 
     @classmethod
     def tearDownClass(cls):
+        # noinspection PyUnresolvedReferences
         cls.serial_device.close()
 
     def setUp(self):
