@@ -5,14 +5,15 @@
 Main class for handling communication with FPGA Board
 """
 import logging
+import os
 from multiprocessing import Process
 from time import sleep
-from typing import List, Callable, Union
+from typing import List, Callable
+
 from serial import Serial, SerialException
-import os
 
 from Software.Devices.Exceptions import *
-from Software.Popups import task_fail
+from Software.Popups import task_fail, PortSelector
 
 root_logger = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class Device(object):
 
     available = False
 
-    def __new__(cls, port: str = '/dev/ttyUSB2') -> object:
+    def __new__(cls) -> object:
         """
         initializes USB serial communication port
         asserts, that the device is ready and responding.
@@ -77,6 +78,9 @@ class Device(object):
         try:
             instance = super().__new__(cls)
             instance.log = root_logger.getChild(cls.__class__.__name__)
+
+            port = PortSelector().get_selection()
+
             instance._dev = Serial(port=port, baudrate=115200, timeout=1)
             instance._dev.reset_input_buffer()
             instance._dev.reset_output_buffer()
@@ -84,7 +88,7 @@ class Device(object):
             instance.comm_test()
             instance.log.info('device passed initial tests')
             return instance
-        except SerialException:
+        except (SerialException, DeviceTestError):
             root_logger.exception('connecting do Hardware failed, returning dummy instead, '
                                   'dumping traceback and returning Dummy instead')
             task_fail('Cannot open device port %s' % port, 'returning dummy device instead')

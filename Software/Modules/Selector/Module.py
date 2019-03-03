@@ -35,7 +35,7 @@ class Module(Gtk.HBox):
 
     def device_selected(self, box, box_row):
         self.device.change_device(box_row.device)
-        self.make_selection(box_row.device)
+        self.make_selection(self.device)
 
     def __init__(self, device):
         self.device = device
@@ -93,7 +93,8 @@ class Module(Gtk.HBox):
         # range through all devices, select the one;
         self.device_list.unselect_all()
         for row in self.box_rows:
-            if device is row.device:
+            print(device._dev, row.device, isinstance(device._dev, row.device))
+            if isinstance(device._dev, row.device):
 
                 buffer = self.text_view.get_buffer()
                 start = buffer.get_start_iter()
@@ -103,6 +104,8 @@ class Module(Gtk.HBox):
 
                 self.device_list.select_row(row)
                 break
+        else:
+            raise Exception('failed to select device')
 
     def redraw(self):
         """This page should be static, so there is no need to redraw anything"""
