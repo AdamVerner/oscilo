@@ -76,8 +76,6 @@ class Plot(Gtk.Alignment):
 
             samples = data['values']
 
-            logging.debug(data.keys(), data['trig_low'], data['trig_up'], len(samples))
-
             self._def_axis(self.ax)
             self.ax.plot(samples, **self.graph_properties)
 
@@ -86,7 +84,7 @@ class Plot(Gtk.Alignment):
             if data['trig_up'] is not None:
                 self.ax.axhline(y=data['trig_up'], color='b', linestyle=':')
             if data['trig_place'] is not None:
-                self.ax.axvline(x=data['trig_place']  , color='r', linestyle=':')
+                self.ax.axvline(x=data['trig_place'], color='r', linestyle=':')
 
             self.queue_draw()
             return True

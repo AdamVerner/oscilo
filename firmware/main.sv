@@ -11,7 +11,11 @@ module main(
 
     output       DS_A, DS_B, DS_C, DS_D, DS_E, DS_F, DS_G,
     output       DSEN_1, DSEN_2, DSEN_3, DSEN_4, // active LOW
-    output       LED_GREEN, LED_RED
+    output       LED_GREEN, LED_RED,
+
+    input [0:7]  ext_adc,
+    output       ext_adc_clk
+
     );
 
     wire [7:0] rx_data;
@@ -223,17 +227,6 @@ module main(
             .WIDTH(8),
             .INC(5),
             .DEC(5)) second_fake( .clk(second_adc_clk), .rst(KEY4), .data_out(second_adc_data) );
-        // third ADC
-        wire       third_adc_clk;
-        wire [7:0] third_adc_data;
-        fake_adc #(
-            .WIDTH(8),
-            .INC(1),
-            .DEC(1)) third_fake(
-            .clk     (third_adc_clk),
-            .rst     (KEY4),
-            .data_out(third_adc_data)
-        );
 
     wire selector_done, selector_activate;
     adc_selector adc_selector_instance(
@@ -247,8 +240,8 @@ module main(
         .adc1_clk (first_adc_clk),
         .adc2_data(second_adc_data),
         .adc2_clk (second_adc_clk),
-        .adc3_data(third_adc_data),
-        .adc3_clk (third_adc_clk),
+        .adc3_data(ext_adc[0:7]),
+        .adc3_clk (ext_adc_clk),
         .adc_data (adc_data),
         .adc_clk  (adc_clk),
     );

@@ -22,6 +22,7 @@ class TrigModes(object):
     RISE = b'\x01'
     FALL = b'\x02'
     BOTH = b'\x03'
+    NONE = b'\x04'
 
     @staticmethod
     def get_str(mode):
@@ -31,6 +32,8 @@ class TrigModes(object):
             return 'FALL'
         if mode == b'\x03':
             return 'BOTH'
+        if mode == b'\x04':
+            return 'NONE'
         raise ValueError('unknown mode')
 
 
@@ -43,7 +46,7 @@ class Device(object):
     name = 'Osciloscope'
     icon = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/oscilloscope.png'))
 
-    HAS_VERTICAL = True
+    HAS_VERTICAL = False
 
     TRIG_MODES = TrigModes()
 
@@ -123,7 +126,7 @@ class Device(object):
         cleans up device
         closes serial port
         """
-        self.set_memory_to(b'\x55')  # random byte
+        self.set_memory_to(b'\x49')  # random byte
 
     def set_memory_to(self, word: bytes) -> None:
         """
@@ -135,6 +138,8 @@ class Device(object):
         self._dev.write(word)
 
     def get_samples(self) -> List[int]:
+
+        self._dev.flushInput()
 
         self._dev.write(self._SAMPLE_READ)  # start sample-reader
         buf = b''
@@ -160,6 +165,9 @@ class Device(object):
 
         post = (samples + samples + samples)[start:stop]  # place trigger point where it should be
         post = [int(x) for x in post]
+
+        print(post, samples)
+        print('#' * 50, 'average value is: ', sum(post) / len(post), '\n\n\n')
         return post
 
     def get_sample_offset(self) -> int:
@@ -167,7 +175,6 @@ class Device(object):
         self._dev.write(self._OFFSET_GETTER)
         offset = self._dev.read(4)
         offset = int(offset.hex(), 16)
-
         return offset
 
     def get_trig_lvl(self) -> int:
@@ -177,9 +184,9 @@ class Device(object):
             return int(self._upper_bound.hex(), 16)
 
     def set_trig_lvl(self, level: int) -> None:
-        self.log.info('trigger level has been set to: %f' % level)
-        self._upper_bound = chr(int(level)).encode('utf-8')
-        self._lower_bound = chr(int(level)).encode('utf-8')
+        self._upper_bound = bytes([int(level)])
+        self._lower_bound = bytes([int(level)])
+        self.log.info('setting trigger to: %s and %s', self._upper_bound, self._lower_bound)
 
         self._set_trig_modes(self._trigger_mode, self._upper_bound, self._lower_bound)
 
@@ -189,33 +196,22 @@ class Device(object):
     def set_trigger_mode(self, mode: bytes) -> None:
         self.log.info('trigger mode has been set to: %s' % mode)
         # TODO verify if mode is legit
-
-        if mode == 'RISING':
-            self._trigger_mode = self.TRIG_MODES.RISE
-        elif mode == 'FALLING':
-            self._trigger_mode = self.TRIG_MODES.FALL
-        elif mode == 'BOTH':
-            self._trigger_mode = self.TRIG_MODES.BOTH
-        elif mode in [self.TRIG_MODES.BOTH, self.TRIG_MODES.FALL, self.TRIG_MODES.BOTH]:
-            self._trigger_mode = mode
-        else:
-            raise UserRequestError('invalid trigger mode')
-
+        self._trigger_mode = mode
         self._set_trig_modes(self._trigger_mode, self._upper_bound, self._lower_bound)
 
     def set_bound(self, upper: int, lower: int) -> None:
         """set bound for trigger windows"""
-        self._upper_bound = chr(int(upper)).encode('utf-8')
-        self._lower_bound = chr(int(lower)).encode('utf-8')
+        self._upper_bound = bytes([int(upper)])
+        self._lower_bound = bytes([int(lower)])
 
         self._set_trig_modes(self._trigger_mode, self._upper_bound, self._lower_bound)
 
     def _set_trig_modes(self, mode: bytes, upper: bytes, lower: bytes) -> None:
+        print('setting trigger', self._TRIG_CONFIG, mode, upper, lower)
         self._dev.write(self._TRIG_CONFIG)
         self._dev.write(mode)
         self._dev.write(upper)
         self._dev.write(lower)
-        sleep(0.2)
 
     def activate_scope(self, sampling_callback: Callable, done_callback: Callable) -> None:
         """
@@ -224,12 +220,21 @@ class Device(object):
         """
 
         self._dev.write(self._ADC_SELECTOR)
-        self._dev.write(b'\x01')  # choose adc
+        self._dev.write(b'\x03')  # choose adc
         self._dev.write(self._SAMPLER)
 
-        # just fake it like a lil bitch and hope nothing goes wrong :)
-        Process(target=lambda *_: (sleep(2), sampling_callback())).start()
-        Process(target=lambda *_: (sleep(4), done_callback())).start()
+        sampling_callback()
+
+        def logic(*_):
+            while True:
+                resp = self._dev.read(1)
+                print('waiting for scope to trigger, received : %s', resp)
+                if resp == b'\x55':
+                    print('received end, breaking')
+                    break
+            done_callback()
+
+        Process(target=logic).start()
 
     @staticmethod
     def get_closests(arr, target):
@@ -266,20 +271,23 @@ class Device(object):
         :return: actual sampling speed, that was set
         """
         ls = [50000000 // div for div in range(1, 65553)][::-1]
-        selected = self.get_closests(ls, speed  )
+        selected = self.get_closests(ls, speed)
         divison = self.MAX_SPEED // selected
 
         lsb = divison & 0xff
-        msb = (divison >> 8)  & 0xff
+        msb = (divison >> 8) & 0xff
 
         print(msb, lsb)
 
         self._dev.write(self._CLK_CFG)
-        self._dev.write(chr(int(msb)).encode('utf-8'))  # LSB
-        self._dev.write(chr(int(lsb)).encode('utf-8'))  # MSB
+        self._dev.write(bytes([int(msb)]))  # LSB
+        self._dev.write(bytes([int(lsb)]))  # MSB
 
         self.sampling_speed = selected
         return selected
 
     def get_sampling_speed(self):
-        return  self.sampling_speed
+        return self.sampling_speed
+
+    def get_trig_place(self):
+        return 0.5

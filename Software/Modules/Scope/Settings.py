@@ -102,7 +102,7 @@ class Trigger(Gtk.Grid):
         btn_rise = Gtk.ToggleButton('RISE')
         btn_fall = Gtk.ToggleButton('FALL')
         btn_both = Gtk.ToggleButton('BOTH')
-        btn_othr = Gtk.ToggleButton('OTHER')  # that fucked-up name is intentional
+        btn_othr = Gtk.ToggleButton('OTHER')  # fucked-up variable name is intentional
 
         btn_rise.props.active = True  # TODO pull current one from device
 
@@ -122,13 +122,14 @@ class Trigger(Gtk.Grid):
                 # process each btn
                 # TODO poll trigger modes from device
                 if btn_pressed == btn_othr:
-                    task_fail()  # TODO add msg with apology
+                    self.device.set_trigger_mode(self.device.TRIG_MODES.NONE)
+                    task_fail()
                 elif btn_pressed == btn_rise:
-                    self.device.trigger_mode = 'RISING'
+                    self.device.set_trigger_mode(self.device.TRIG_MODES.RISE)
                 elif btn_pressed == btn_fall:
-                    self.device.trigger_mode = 'FALLING'
+                    self.device.set_trigger_mode(self.device.TRIG_MODES.FALL)
                 elif btn_pressed == btn_both:
-                    self.device.trigger_mode = 'BOTH'
+                    self.device.set_trigger_mode(self.device.TRIG_MODES.BOTH)
 
         btn_rise.connect('toggled', btn_callback)
         btn_fall.connect('toggled', btn_callback)
@@ -262,18 +263,20 @@ class Horizontal(Gtk.Grid):
         pos_adj = Gtk.Adjustment(self.device.get_trig_place(), 0, 1.1, 0.1, 0.1, 0.1)
         pos_adj.set_value(self.device.get_trig_place())
 
-        maximum = (self.device.MAX_SPEED) ** ( 1.02535 / self.exp)
-        minimum = (self.device.MIN_SPEED) ** ( 1.0 / self.exp)
-        current = self.device.get_sampling_speed() ** ( 1.0 / self.exp)
+        maximum = self.device.MAX_SPEED ** (1.02535 / self.exp)
+        minimum = self.device.MIN_SPEED ** (1.0 / self.exp)
+        current = self.device.get_sampling_speed() ** (1.0 / self.exp)
 
         spd_adj = Gtk.Adjustment(current, minimum, maximum, 1, 1, 10)
         spd_adj.set_value(current)
 
         pos_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, pos_adj)
-        pos_scale.set_size_request(-1, -1); pos_scale.set_draw_value(False)
+        pos_scale.set_size_request(-1, -1)
+        pos_scale.set_draw_value(False)
 
         spd_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, spd_adj)
-        spd_scale.set_size_request(-1, -1); spd_scale.set_draw_value(False)
+        spd_scale.set_size_request(-1, -1)
+        spd_scale.set_draw_value(False)
 
         def pos_changed(adjust):
             val = pos_adj.get_value()
@@ -351,6 +354,7 @@ class Control(Gtk.Grid):
 
     def push_wrap(self, *_):
         if self.push_func:
+            print('calling push functiuon', self.push_func)
             self.push_func()
 
     def __init__(self, device: Device):

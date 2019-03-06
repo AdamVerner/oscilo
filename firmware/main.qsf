@@ -89,14 +89,24 @@ set_location_assignment PIN_89 -to KEY4
 set_location_assignment PIN_126 -to LED_RED
 set_location_assignment PIN_125 -to LED_GREEN
 
-set_location_assignment PIN_124 -to debug[7]
-set_location_assignment PIN_120 -to debug[6]
-set_location_assignment PIN_113 -to debug[5]
-set_location_assignment PIN_115 -to debug[4]
-set_location_assignment PIN_111 -to debug[3]
-set_location_assignment PIN_104 -to debug[2]
-set_location_assignment PIN_105 -to debug[1]
+set_location_assignment PIN_99 -to debug[1]
 set_location_assignment PIN_98 -to debug[0]
+
+set_location_assignment PIN_100 -to ext_adc_clk
+set_location_assignment PIN_120 -to ext_adc_otr
+set_location_assignment PIN_119 -to ext_adc[0]
+set_location_assignment PIN_113 -to ext_adc[1]
+set_location_assignment PIN_114 -to ext_adc[2]
+set_location_assignment PIN_115 -to ext_adc[3]
+set_location_assignment PIN_110 -to ext_adc[4]
+set_location_assignment PIN_111 -to ext_adc[5]
+set_location_assignment PIN_112 -to ext_adc[6]
+set_location_assignment PIN_104 -to ext_adc[7]
+set_location_assignment PIN_106 -to ext_adc[8]
+set_location_assignment PIN_105 -to ext_adc[9]
+set_location_assignment PIN_103 -to ext_adc[10]
+set_location_assignment PIN_101 -to ext_adc[11]
+
 
 set_global_assignment -name SYSTEMVERILOG_FILE main.sv
 set_global_assignment -name SYSTEMVERILOG_FILE uart_rx.sv
