@@ -85,8 +85,8 @@ class Plot(Gtk.Alignment):
                 self.ax.axhline(y=data['trig_low'], color='b', linestyle=':')
             if data['trig_up'] is not None:
                 self.ax.axhline(y=data['trig_up'], color='b', linestyle=':')
-
-            self.ax.axvline(x=self.device.get_trig_place() * len(samples), color='r', linestyle=':')
+            if data['trig_place'] is not None:
+                self.ax.axvline(x=data['trig_place']  , color='r', linestyle=':')
 
             self.queue_draw()
             return True
@@ -99,8 +99,10 @@ class Plot(Gtk.Alignment):
         data = {
             'values': self.device.get_samples(),
             'trig_low': self.device.get_trig_lvl(),
-            'trig_up': self.device.get_trig_lvl()
+            'trig_up': self.device.get_trig_lvl(),
+            'trig_place': self.device.get_trig_place() * self.device.sample_count
         }
+        print('data trigplace', data['trig_place'])
         self.child_conn.send(data)
 
     @staticmethod

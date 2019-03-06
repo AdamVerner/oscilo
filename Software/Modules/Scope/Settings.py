@@ -234,48 +234,94 @@ class Horizontal(Gtk.Grid):
     sec/div
     |------------------|
     | |--------------| |
-    | |  SPIN BUTTON | |
+    | |  POS ADJUST  | |
     | |--------------| |
     | |--------------| |
-    | |    ROUGH     | |
+    | |    POS SET   | |
     | |--------------| |
     | |--------------| |
-    | |     SET      | |
+    | | SPEED ADJUST | |
     | |--------------| |
-    |------------------|
+    | |--------------| |
+    | |  SPEED SET   | |
+    | |--------------| |
     """
+
+    exp = 4.0
 
     def __init__(self, device: Device):
         super(Horizontal, self).__init__()
         self.device = device
         label = Gtk.Label(LABEL_START + 'HORIZONTAL MENU' + LABEL_END, **LABEL_PROPS)
 
-        el = Gtk.Label()
+        pos_lbl = Gtk.Label()
+        pos_lbl.set_use_markup(True)
+        spd_lbl = Gtk.Label()
+        spd_lbl.set_use_markup(True)
 
-        sps_adjust = Gtk.Adjustment(self.device.get_trig_place(), 0, 1.1, 0.1, 0.1, 0.1)
-        sps_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, sps_adjust)
-        sps_scale.set_size_request(-1, -1)
-        sps_scale.set_inverted(False)
-        sps_scale.set_digits(1)
-        sps_scale.set_draw_value(False)
+        pos_adj = Gtk.Adjustment(self.device.get_trig_place(), 0, 1.1, 0.1, 0.1, 0.1)
+        pos_adj.set_value(self.device.get_trig_place())
 
-        def set_sps(_):
-            self.device.set_trig_place(sps_scale.get_value())
+        maximum = (self.device.MAX_SPEED) ** ( 1.02535 / self.exp)
+        minimum = (self.device.MIN_SPEED) ** ( 1.0 / self.exp)
+        current = self.device.get_sampling_speed() ** ( 1.0 / self.exp)
 
-        def changed(adjust):
-            el.set_label("{0:.2f}".format(adjust.get_value()) + '%')
+        spd_adj = Gtk.Adjustment(current, minimum, maximum, 1, 1, 10)
+        spd_adj.set_value(current)
 
-        changed(sps_adjust)  # trigger once, so the default value gets overwritten
+        pos_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, pos_adj)
+        pos_scale.set_size_request(-1, -1); pos_scale.set_draw_value(False)
 
-        sps_adjust.connect('value-changed', changed)
+        spd_scale = Gtk.Scale.new(Gtk.Orientation.HORIZONTAL, spd_adj)
+        spd_scale.set_size_request(-1, -1); spd_scale.set_draw_value(False)
 
-        sps_set = Gtk.Button('SET')
-        sps_set.connect('pressed', set_sps)
+        def pos_changed(adjust):
+            val = pos_adj.get_value()
+            print(val)
+            pos_lbl.set_markup("<span color='green'> %.2f%%</span>" % val)
+        pos_adj.connect('value-changed', pos_changed)
 
-        self.attach(label, 0, 0, 1, 1)
-        self.attach(el, 0, 1, 1, 1)
-        self.attach(sps_scale, 0, 2, 1, 1)
-        self.attach(sps_set, 0, 3, 1, 1)
+        def spd_to_str(speed):
+            if speed <= 2000:
+                return '%.1f Hz' % speed
+            if speed <= 1500000:
+                return '%.2f KHz' % (speed / 1000)
+            return '%.2f Mhz' % (speed / 1000000)
+
+        def spd_changed(adjust):
+            val = spd_adj.get_value() ** self.exp
+            spd_lbl.set_markup("<span color='green'>%s</span>" % spd_to_str(val))
+        spd_adj.connect('value-changed', spd_changed)
+
+        def pos_set(btn):
+            self.device.set_trig_place(pos_scale.get_value())
+            pos_lbl.set_markup("<span color='black'>{0:.2f}%</span>".format(
+                pos_adj.get_value()))
+
+        pos_btn = Gtk.Button('SET Position')
+        pos_btn.connect('pressed', pos_set)
+        spd_btn = Gtk.Button('SET Speed')
+
+        # changed(post_adj)  # trigger once, so the default value gets overwritten
+        def spd_set(btn):
+            val = spd_scale.get_value() ** self.exp
+            spd_lbl.set_markup("<span color='black'>%s</span>" %
+                               spd_to_str(self.device.set_sampling_speed(val)))
+        spd_btn.connect('pressed', spd_set)
+
+        pos_changed(None)
+        spd_changed(None)
+
+
+        self.attach(label,      0, 0, 1, 1)
+
+        self.attach(pos_lbl,   0, 1, 1, 1)
+        self.attach(pos_scale, 0, 2, 1, 1)
+        self.attach(pos_btn,   0, 3, 1, 1)
+
+        self.attach(spd_lbl,   0, 4, 1, 1)
+        self.attach(spd_scale, 0, 5, 1, 1)
+        self.attach(spd_btn,   0, 6, 1, 1)
 
 
 class Filters(Gtk.Grid):

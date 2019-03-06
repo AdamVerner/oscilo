@@ -47,7 +47,11 @@ class Device(object):
 
     TRIG_MODES = TrigModes()
 
+    MAX_SPEED = 50000000  # 50Mhz samplping clock
+    MIN_SPEED = 50000000 / 65535
+
     sample_count = 255  # maximum number of samples the device can store
+    sampling_speed = MAX_SPEED
 
     _trigger_mode = TRIG_MODES.RISE
     _upper_bound = b'\x80'
@@ -63,6 +67,7 @@ class Device(object):
     _OFFSET_GETTER = b'\x24'
     _ADC_SELECTOR = b'\x25'
     _TRIG_CONFIG = b'\x31'
+    _CLK_CFG = b'\x32'
     _REPLAYER = b'\x71'
     _REPLY_CNT = b'\x72'
 
@@ -225,3 +230,56 @@ class Device(object):
         # just fake it like a lil bitch and hope nothing goes wrong :)
         Process(target=lambda *_: (sleep(2), sampling_callback())).start()
         Process(target=lambda *_: (sleep(4), done_callback())).start()
+
+    @staticmethod
+    def get_closests(arr, target):
+        n = len(arr)
+        left = 0
+        right = n - 1
+        mid = 0
+
+        # edge case - last or above all
+        if target >= arr[n - 1]:
+            return arr[n - 1]
+        # edge case - first or below all
+        if target <= arr[0]:
+            return arr[0]
+        # BSearch solution: Time & Space: Log(N)
+
+        while left < right:
+            mid = (left + right) // 2  # find the mid
+            if target < arr[mid]:
+                right = mid
+            elif target > arr[mid]:
+                left = mid + 1
+            else:
+                return arr[mid]
+
+        if target < arr[mid]:
+            return arr[mid] if target - arr[mid - 1] >= arr[mid] - target else arr[mid - 1]
+        else:
+            return arr[mid + 1] if target - arr[mid] >= arr[mid + 1] - target else arr[mid]
+
+    def set_sampling_speed(self, speed):
+        """
+        :param speed: speed to set in herz
+        :return: actual sampling speed, that was set
+        """
+        ls = [50000000 // div for div in range(1, 65553)][::-1]
+        selected = self.get_closests(ls, speed  )
+        divison = self.MAX_SPEED // selected
+
+        lsb = divison & 0xff
+        msb = (divison >> 8)  & 0xff
+
+        print(msb, lsb)
+
+        self._dev.write(self._CLK_CFG)
+        self._dev.write(chr(int(msb)).encode('utf-8'))  # LSB
+        self._dev.write(chr(int(lsb)).encode('utf-8'))  # MSB
+
+        self.sampling_speed = selected
+        return selected
+
+    def get_sampling_speed(self):
+        return  self.sampling_speed
