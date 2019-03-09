@@ -13,7 +13,10 @@ module fake_adc(
 
     reg [WIDTH:0] stage_data = 0;  // one bit bigger, for securing overflows
 
-    assign data_out = stage_data - 127;
+    parameter maxsize = (1<<WIDTH)-1;
+    parameter halfsize = (1<<WIDTH-1)-1;
+
+    assign data_out = stage_data - halfsize;
 
     reg [1:0] adc_state;
     parameter ST_INC = 0;
@@ -22,21 +25,21 @@ module fake_adc(
     always @(posedge clk)
         begin
             if (~rst)
-                stage_data = 127;
+                stage_data = halfsize;
             else begin
                 case(adc_state)
                     ST_INC: begin
                         stage_data += INC;
-                        if(stage_data >= 383)
+                        if(stage_data >= (maxsize + halfsize))
                             adc_state = ST_DEC;
                     end
                     ST_DEC: begin
                         stage_data -= DEC;
-                        if (stage_data <= 127)
+                        if (stage_data <= halfsize)
                             adc_state = ST_INC;
                     end
                     default: begin
-                        stage_data = 127;
+                        stage_data = halfsize;
                         adc_state = ST_INC;
                     end
                 endcase

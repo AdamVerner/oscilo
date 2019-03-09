@@ -15,7 +15,7 @@ module divider(
     reg        oclk = 1;
     reg        en_thr = 0;
 
-    assign out_clk = en_thr ? clk:oclk;
+    assign out_clk = en_thr ? clk: oclk;
 
     always @(posedge clk)
         begin

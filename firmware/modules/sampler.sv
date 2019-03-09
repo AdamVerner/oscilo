@@ -13,10 +13,10 @@ module sampler(
     output                    done = 0,    // signals that the module has done what it needed to do
 
     output                    adc_clk,
-    input  [7:0]              adc_data,
+    input  [WIDTH-1:0]              adc_data,
 
     output                    mem_clk,
-    output [7:0]              mem_data,
+    output [WIDTH-1:0]              mem_data,
     output                    mem_we,
     output [SAMPLE_DEPTH-1:0] mem_addr,
     output [SAMPLE_DEPTH-1:0] offset,
@@ -36,6 +36,7 @@ module sampler(
     );
 
     parameter SAMPLE_DEPTH = 8; // 256 samples
+    parameter WIDTH = 8;
 
 
     wire std_clk;

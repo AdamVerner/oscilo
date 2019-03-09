@@ -18,7 +18,7 @@ class MainTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.log.setLevel(logging.DEBUG)
-        cls.serial_device = Serial(port='/dev/ttyUSB1', baudrate=115200, timeout=1)
+        cls.serial_device = Serial(port='/dev/ttyS9', baudrate=115200, timeout=1)
 
     @classmethod
     def tearDownClass(cls):
@@ -63,20 +63,29 @@ class MainTest(unittest.TestCase):
 
         self.serial_device.write(b'\x22')  # start sample-reader
 
-        samples = self.serial_device.read(255)  # read all samples
-        print(samples)
-        self.assertEqual(len(samples), 255)
+        samples = self.serial_device.read(1024)  # read all samples
+        self.assertEqual(len(samples) // 2 , 256)
 
     def test_mem_clear(self):
-        word = b'\x11'  # select a 1 byte word to test with
+        word = b'\x12'  # select a 1 byte word to test with
 
         self.serial_device.write(b'\x23')  # enable mem_clear
         self.serial_device.write(word)  # send word to set memmory to
 
         self.serial_device.write(b'\x22')  # start sample-reader
-        samples = self.serial_device.read(255)  # read all samples
-        print(samples)
-        self.assertEqual(word * 255, samples)
+        samples = self.serial_device.read(1024)  # read all samples
+        # samples = [int(x) for x in samples]
+
+        msbs = samples[::2]
+        lsbs = samples[1::2]
+
+        self.assertEqual(len(msbs), 256)
+        self.assertEqual(len(lsbs), 256)
+
+        joint = [(int(msb) << 8) + int(lsb) for msb, lsb in zip(msbs, lsbs)]
+        print(joint)
+        self.assertEqual(b'\x00' * 256 , msbs, 'MSBs don\'t match')
+        self.assertEqual(word * 256, lsbs, 'lsbs don\'t match')
 
     def test_offset(self):
         self.serial_device.write(b'\x24')

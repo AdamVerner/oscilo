@@ -1,4 +1,4 @@
-module main(
+	module main(
 
     input        CLK, // MAIN 50 MHZ clock
 
@@ -13,7 +13,7 @@ module main(
     output       DSEN_1, DSEN_2, DSEN_3, DSEN_4, // active LOW
     output       LED_GREEN, LED_RED,
 
-    input [0:7]  ext_adc,
+    input [0:11] ext_adc,
     output       ext_adc_clk
 
     );
@@ -68,11 +68,11 @@ module main(
 
     // sampling memmory start
     wire       sm_we, sm_oe, sm_clk;
-    wire [7:0] sm_data_in;
-    wire [7:0] sm_data_out;
+    wire [11:0] sm_data_in;
+    wire [11:0] sm_data_out;
     wire [7:0] sm_addr_in;
     wire [7:0] sm_addr_out;
-    ram_sw_ar#(.DATA_WIDTH(8), .ADDR_WIDTH(SAMPLE_DEPTH)) sample_memmory(
+    ram_sw_ar#(.DATA_WIDTH(12), .ADDR_WIDTH(SAMPLE_DEPTH)) sample_memmory(
         .clk     (sm_clk),
         .addr_in (sm_addr_in),
         .addr_out(sm_addr_out),
@@ -87,11 +87,11 @@ module main(
 
     // mem clearer start
     wire       mem_clear_activate, mem_clear_done;
-    wire [7:0] mem_clear_data_in;
+    wire [11:0] mem_clear_data_in;
     wire [SAMPLE_DEPTH-1:0] mem_clear_addr_in;
     wire       mem_clear_we;
     wire       mem_clear_clk;
-    mem_clear #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) mem_clear_instance(
+    mem_clear #(.SAMPLE_DEPTH(SAMPLE_DEPTH), .WIDTH(12)) mem_clear_instance(
       .clk_50mhz(CLK),
       .reset    (KEY4),
       .activate (mem_clear_activate),
@@ -123,7 +123,7 @@ module main(
         .en_fall(en_fall)
     );
     wire                    trig_rst, trig;
-    trigger #(.WIDTH(8)) trigger_instance(
+    trigger #(.WIDTH(12)) trigger_instance(
         .rst(KEY4),
         .clk(adc_clk),   // wire it parallel to sampler
         .data(adc_data),
@@ -142,16 +142,16 @@ module main(
     assign LED_GREEN = sampler_activate;
     assign LED_RED = sampler_done;
     wire                    sampler_activate, sampler_done;
-    wire [7:0]              adc_data;
+    wire [11:0]             adc_data;
     wire                    adc_clk;
-    wire [7:0]              sampler_data_in;
+    wire [11:0]              sampler_data_in;
     wire                    sampler_we;
     wire                    sampler_clk;
     wire [SAMPLE_DEPTH-1:0] sampler_addr_in;
     wire [SAMPLE_DEPTH-1:0] offset;
     wire [7:0]              sampler_tx_data;
     wire                    sampler_tx_start;
-    sampler #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sampler_instance(
+    sampler #(.SAMPLE_DEPTH(SAMPLE_DEPTH), .WIDTH(12)) sampler_instance(
         .clk_50mhz (CLK),
         .reset     (KEY4),
         .activate  (sampler_activate),
@@ -193,7 +193,7 @@ module main(
     wire                    sampler_reader_tx_start;
     wire                    sample_reader_oe;
     wire [SAMPLE_DEPTH-1:0] sample_reader_addr_out;
-    sample_reader #(.SAMPLE_DEPTH(SAMPLE_DEPTH)) sample_reader_instace(
+    sample_reader #(.SAMPLE_DEPTH(SAMPLE_DEPTH), .WIDTH(12)) sample_reader_instace(
         .clk_50mhz(CLK),
         .reset(KEY4),
         .activate(sample_reader_activate),
@@ -211,9 +211,9 @@ module main(
     // adc selector start
         // first ADC
         wire       first_adc_clk;
-        wire [7:0] first_adc_data;
+        wire [11:0] first_adc_data;
         fake_adc #(
-            .WIDTH(8),
+            .WIDTH(12),
             .INC(1),
             .DEC(1)) first_fake(
             .clk     (CLK),
@@ -222,14 +222,14 @@ module main(
         );
         // second ADC
         wire       second_adc_clk;
-        wire [7:0] second_adc_data;
+        wire [11:0] second_adc_data;
         fake_adc #(
-            .WIDTH(8),
+            .WIDTH(12),
             .INC(5),
             .DEC(5)) second_fake( .clk(second_adc_clk), .rst(KEY4), .data_out(second_adc_data) );
 
     wire selector_done, selector_activate;
-    adc_selector adc_selector_instance(
+    adc_selector #(.WIDTH(12)) adc_selector_instance(
         .clk      (CLK),
         .rst      (KEY4),
         .activate (selector_activate),
@@ -240,10 +240,10 @@ module main(
         .adc1_clk (first_adc_clk),
         .adc2_data(second_adc_data),
         .adc2_clk (second_adc_clk),
-        .adc3_data(ext_adc[0:7]),
+        .adc3_data(ext_adc[0:11]),
         .adc3_clk (ext_adc_clk),
         .adc_data (adc_data),
-        .adc_clk  (adc_clk),
+        .adc_clk  (adc_clk)
     );
     // adc selector stop
 
@@ -266,8 +266,8 @@ module main(
 
 
     // replayer_instance start
-    wire       replayer_activate, replayer_done;
-    wire [7:0] replayer_tx_data, replayer_tx_start;
+    wire       replayer_activate, replayer_done, replayer_tx_start;
+    wire [7:0] replayer_tx_data;
     replayer replayer_instance(
         .clk      (CLK),
         .reset    (KEY4),
@@ -284,8 +284,8 @@ module main(
 
 
     // reply_cnt_instance start
-    wire       reply_cnt_activate, reply_cnt_done;
-    wire [7:0] reply_cnt_tx_data, reply_cnt_tx_start;
+    wire       reply_cnt_activate, reply_cnt_done, reply_cnt_tx_start;
+    wire [7:0] reply_cnt_tx_data;
     reply_cnt reply_cnt_instance(
         .clk      (CLK),
         .reset    (KEY4),
@@ -326,8 +326,8 @@ module main(
     assign sm_we =  (sampler_we  && sampler_activate) | (mem_clear_we  && mem_clear_activate);
     assign sm_clk = (sampler_clk && sampler_activate) | (mem_clear_clk && mem_clear_activate);
 
-    assign sm_data_in = (sampler_data_in   & {8{sampler_activate}}) |
-                        (mem_clear_data_in & {8{mem_clear_activate}});
+    assign sm_data_in = (sampler_data_in   & {12    {sampler_activate}}) |
+                        (mem_clear_data_in & {12{mem_clear_activate}});
 
     assign sm_addr_in = (sampler_addr_in   & {8{sampler_activate}}) |
                         (mem_clear_addr_in & {8{mem_clear_activate}});

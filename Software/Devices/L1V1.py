@@ -53,7 +53,7 @@ class Device(object):
     MAX_SPEED = 50000000  # 50Mhz samplping clock
     MIN_SPEED = 50000000 / 65535
 
-    sample_count = 255  # maximum number of samples the device can store
+    sample_count = 256  # maximum number of samples the device can store
     sampling_speed = MAX_SPEED
 
     _trigger_mode = TRIG_MODES.RISE
@@ -151,7 +151,14 @@ class Device(object):
                 break
             buf += b
 
-        samples = list(buf)
+        msbs = buf[::2]
+        lsbs = buf[1::2]
+
+        print(msbs)
+        print(lsbs)
+
+        samples = [(int(msb) << 8) + int(lsb) for msb, lsb in zip(msbs, lsbs)]
+
         self.log.info('num of samples = %d', len(samples))
 
         if len(samples) != self.sample_count:
@@ -166,8 +173,12 @@ class Device(object):
         post = (samples + samples + samples)[start:stop]  # place trigger point where it should be
         post = [int(x) for x in post]
 
-        print(post, samples)
-        print('#' * 50, 'average value is: ', sum(post) / len(post), '\n\n\n')
+        # post = [int('{:12b}'.format(n)[::-1], 2) for n in post]
+
+        print(post, samples, '\n\n')
+        print('#' * 50, 'average value is: ', sum(post) / len(post))
+        print('#' * 50, 'min value is:     ', min(post))
+        print('#' * 50, 'max value is:     ', max(post), '\n\n\n')
         return post
 
     def get_sample_offset(self) -> int:
@@ -179,9 +190,9 @@ class Device(object):
 
     def get_trig_lvl(self) -> int:
         if self._trigger_mode == self.TRIG_MODES.FALL:
-            return int(self._lower_bound.hex(), 16)
+            return int(self._lower_bound.hex(), 16) >> 8
         else:
-            return int(self._upper_bound.hex(), 16)
+            return int(self._upper_bound.hex(), 16) >> 8
 
     def set_trig_lvl(self, level: int) -> None:
         self._upper_bound = bytes([int(level)])
@@ -272,7 +283,7 @@ class Device(object):
         """
         ls = [50000000 // div for div in range(1, 65553)][::-1]
         selected = self.get_closests(ls, speed)
-        divison = self.MAX_SPEED // selected
+        divison = self.MAX_SPEED // selected - 1
 
         lsb = divison & 0xff
         msb = (divison >> 8) & 0xff

@@ -105,7 +105,7 @@ set_location_assignment PIN_104 -to ext_adc[7]
 set_location_assignment PIN_106 -to ext_adc[8]
 set_location_assignment PIN_105 -to ext_adc[9]
 set_location_assignment PIN_103 -to ext_adc[10]
-set_location_assignment PIN_101 -to ext_adc[11]
+set_location_assignment PIN_98 -to ext_adc[11]
 
 
 set_global_assignment -name SYSTEMVERILOG_FILE main.sv

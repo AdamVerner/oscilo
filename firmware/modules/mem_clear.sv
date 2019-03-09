@@ -10,12 +10,13 @@ module mem_clear(
     input        rx_ready,
 
     output       mem_clk,
-    output [7:0] mem_data,
+    output [WIDTH-1:0] mem_data,
     output [SAMPLE_DEPTH-1:0] mem_addr,
     output       mem_we
 );
 
     parameter SAMPLE_DEPTH = 8;
+    parameter WIDTH = 8;
 
     reg [3:0] sampler_state;
     parameter ST_IDLE = 0;
@@ -23,7 +24,7 @@ module mem_clear(
     parameter ST_WRITE = 2;
     parameter ST_CLEAR = 3;
 
-    reg [8:0] information;
+    reg [WIDTH-1:0] write_word;
 
     reg       enable_mem_clk;
     assign mem_clk = clk_50mhz && enable_mem_clk;
@@ -42,7 +43,7 @@ module mem_clear(
 
                 ST_RECV: begin
                     if (rx_ready) begin
-                        information = rx_data;
+                        write_word = rx_data;
                         sampler_state = ST_WRITE;
                         mem_addr = 0;
                     end
@@ -52,7 +53,7 @@ module mem_clear(
                     enable_mem_clk = 1;
                     mem_we = 1;
                     mem_addr += 1;
-                    mem_data = information;
+                    mem_data = write_word;
                     if (mem_addr == (1 << SAMPLE_DEPTH)-1 ) begin
                       sampler_state = ST_CLEAR;
                     end
