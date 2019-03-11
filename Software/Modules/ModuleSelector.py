@@ -25,6 +25,7 @@ from gi.repository import Gtk
 
 from Software.Modules.Scope.Module import Module as ScopeModule
 from Software.Modules.Selector.Module import Module as DeviceSelector
+from Software.Modules.Overview.Module import Module as Overview
 
 
 class ModuleSelector(Gtk.Notebook):
@@ -37,8 +38,9 @@ class ModuleSelector(Gtk.Notebook):
         self.device = device
 
         self.pages = list()
-        self.pages.append(['Scope', ScopeModule(self.device)])
         self.pages.append(['DeviceSelector', DeviceSelector(self.device)])
+        self.pages.append(['Scope', ScopeModule(self.device)])
+        self.pages.append(['Overview', Overview()])
 
         for page in self.pages:
             # label = Gtk.Label()

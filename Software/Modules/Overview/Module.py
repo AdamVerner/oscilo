@@ -19,8 +19,6 @@ This is an OpenSource osciloscope controll application written in python with us
 This project was developed as a school work, but it's much more than that.
 """
 
-
-
         lbl = Gtk.Label()
         # lbl.set_justify(Gtk.JUSTIFY_LEFT)
         print(lbl.get_justify())
