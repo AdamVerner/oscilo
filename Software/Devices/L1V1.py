@@ -17,6 +17,9 @@ from Software.Popups import task_fail, PortSelector
 
 root_logger = logging.getLogger(__name__)
 
+CONST_M = 0.00248
+CONST_B = -5.15229
+
 
 class TrigModes(object):
     RISE = b'\x01'
@@ -173,7 +176,7 @@ class Device(object):
         post = (samples + samples + samples)[start:stop]  # place trigger point where it should be
         post = [int(x) for x in post]
 
-        # post = [int('{:12b}'.format(n)[::-1], 2) for n in post]
+        post = [CONST_M * x + CONST_B for x in post]
 
         print(post, samples, '\n\n')
         print('#' * 50, 'average value is: ', sum(post) / len(post))
