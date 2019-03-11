@@ -76,15 +76,35 @@ class Plot(Gtk.Alignment):
 
             samples = data['values']
 
+            ys = []
+            tmp = 0
+
+            sample_time = 1 / device.get_sampling_speed()
+
+            val = 0
+            vals = ['S', 'mS', 'uS', 'nS', 'pS']
+            for val in range(0, len(vals)):
+                if sample_time > 10:
+                    break
+                sample_time = sample_time * 1000
+
+            print('scaled and vals set to ', vals[val])
+
+            tmp = 0
+            for y in range(len(samples)):
+                ys.append(tmp)
+                tmp = tmp + 1 / sample_time
+
             self._def_axis(self.ax)
-            self.ax.plot(samples, **self.graph_properties)
+            self.ax.set_xlabel('Time [%s]' % vals[val])
+            self.ax.plot(ys, samples, **self.graph_properties)
 
             if data['trig_low'] is not None:
                 self.ax.axhline(y=data['trig_low'], color='b', linestyle=':')
             if data['trig_up'] is not None:
                 self.ax.axhline(y=data['trig_up'], color='b', linestyle=':')
             if data['trig_place'] is not None:
-                self.ax.axvline(x=data['trig_place'], color='r', linestyle=':')
+                self.ax.axvline(x=data['trig_place'] * sample_time, color='r', linestyle=':')
 
             self.queue_draw()
             return True
@@ -98,7 +118,7 @@ class Plot(Gtk.Alignment):
             'values': self.device.get_samples(),
             'trig_low': self.device.get_trig_lvl(),
             'trig_up': self.device.get_trig_lvl(),
-            'trig_place': self.device.get_trig_place() * self.device.sample_count
+            'trig_place': self.device.get_trig_place()
         }
         print('data trigplace', data['trig_place'])
         self.child_conn.send(data)
