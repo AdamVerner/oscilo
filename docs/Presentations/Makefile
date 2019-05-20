@@ -1,4 +1,4 @@
-FILENAME := Obhajoba1
+FILENAME := Obhajoba3
 CC := pdflatex -synctex=1 -interaction=nonstopmode
 DEPS := beamerthemeBlacko.sty beamercolorthemeBlacko.sty
 
