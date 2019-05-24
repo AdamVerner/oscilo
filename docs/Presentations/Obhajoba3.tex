@@ -7,33 +7,6 @@
 \usetheme{Blacko}
 
 \setcounter{tocdepth}{2}  % hide subsubsections and lower
-
-\AtBeginSection[]{
-	\ifnum \value{framenumber}>1  % don't show on first page
-		\begin{frame}
-			\frametitle{Plan}
-			\tableofcontents[currentsection]
-		\end{frame}
-    \else\fi
-
-	\begin{frame}
-	\vfill
-	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-		\usebeamerfont{title}\insertsectionhead\par%
-	\end{beamercolorbox}
-	\vfill
-	\end{frame}	    
-}
-
-\AtBeginSection[]{
-	\begin{frame}
-	\vfill
-	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-		\usebeamerfont{title}\insertsectionhead\par%
-	\end{beamercolorbox}
-	\vfill
-	\end{frame}	    
-}
   
 \setbeamercovered{%
   again covered={\opaqueness<1->{15}}}
@@ -50,108 +23,80 @@
 	
 \section{Cíle}
 
-	\begin{frame}{Cíle}
+	\begin{frame}{Goals}
 		\begin{itemize}
-
-			\item Hardware			\pause
-			\item Aplikace na PC	\pause
-			\item Firmware zařízení \pause
-			\item Ekosystém
-		
+			\item Hardware
+			\item Firmware
+			\item PC App
+			\item Ecosystem
 		\end{itemize}
-	\end{frame}		
-	
-	
-	
-	\begin{frame}{ADC}
-		\includegraphics[width=\paperwidth]{adc_board.jpg}
 	\end{frame}
 
-	\begin{frame}{FPGA}
-		\includegraphics[width=\paperwidth]{ZRtech_board.jpg}
+\section{Hardware}
+
+%	\begin{frame}{FPGA}
+%		\includegraphics[width=\paperwidth]{ZRtech_board.jpg}
+%	\end{frame}
+
+%	
+%	\begin{frame}{ADC}
+%		\includegraphics[width=\paperwidth]{adc_board.jpg}
+%	\end{frame}
+
+	\begin{frame}{Hardware topology}
+		\includegraphics[width=0.9\paperwidth]{Topology.png}
 	\end{frame}
 
-	\subsection{Hardware}
-	\begin{frame}{Hardware}
+	\begin{frame}{Properties}
 		\begin{itemize}
-			\item Vybrat ADC
-				\begin{itemize}
-					\item min 12 bit 
-					\item min 10MSPS
-				\end{itemize}
-			\item Vybrat FPGA
-				\begin{itemize}
-					\item Cyclone IV E EP4CE6E22C8
-					\item 200Mhz
-					\item 6272 logic-elements
-					\item 276,480 mem bits + 64Mb on-board
-				\end{itemize}			
-			\item[]
-			\item[]
+			\item 50 MSPS
+			\item $<$0.15 sec refresh
+			\item 12bit precision $\approx$ 2.44 mV step
+			\item 100Mb sample memmory
+			\item upto 460,800 baud
 		\end{itemize}
 	\end{frame}
 
 
-	
-	\subsection{Hardware}
-	\begin{frame}{Hardware}
+\section{Firmware}
+	\begin{frame}{Firmware}
 		\begin{itemize}
-			\item Vybrat ADC
-				\begin{itemize}
-					\item min 12 bit 
-					\item min 10MSPS
-				\end{itemize}
-			\item Vybrat FPGA
-				\begin{itemize}
-					\item Cyclone IV E EP4CE6E22C8
-					\item 200Mhz
-					\item 6272 logic-elements
-					\item 276,480 mem bits + 64Mb on-board
-					\item on-board usb-uart
-				\end{itemize}			
-			\item \sout{externí RAM} \pause
-			\item propojení desek
+			\item system
 		\end{itemize}
 	\end{frame}
-	
-	
-	\subsection{Firmware}
-		\begin{frame}{Firmware}
-			\includegraphics[width=\paperwidth]{rtl_fake.png}
-		\end{frame}
-	\subsection{Návrh řídící aplikace a její implementace}
-		\begin{frame}{Software}
-			\includegraphics[width=\paperwidth]{oscilo_fake.png}
-		\end{frame}
-		\begin{frame}{Software}
-			\includegraphics[width=\paperwidth]{profile_fake.png}
-		\end{frame}
-	\subsection{Textová část}
-		\begin{frame}{Textová část}
-			\begin{itemize}
-				\item \LaTeX\ template pro hlavní textovou část
-				\item \LaTeX\  pro tuhle prezentaci
-				\item Hrubá struktura kapitol
-				\item Úvod a pár kapitolek
-				\item Do neděle spousta času
-			\end{itemize}		
-		\end{frame}
 
-\section{Co budu dělat dál}
+	\begin{frame}
+		\includegraphics[width=1\paperwidth]{Firmware.png}
+	\end{frame}
 
-\subsection{Moduly do FPGA}
-\subsection{Ladění}
-\subsection{PC applikace}
-\subsection{Textová část}
+	\begin{frame}{Firmware}
+		\begin{itemize}
+			\item system
+			\item protocol
+			\item tests
+		\end{itemize}
+	\end{frame}
+
+\section{PC APP}
+	\begin{frame}{What can we do}
+		\begin{itemize}
+			\item Waveform display
+			\item Device configration
+			\item Data analysis \& exportation
+			\item tests
+		\end{itemize}
+	\end{frame}
+
+
+	\begin{frame}{Structure}
+		\includegraphics[width=0.9\paperwidth]{SWlayers.png}
+	\end{frame}
+
+
 
 \begin{frame}{}
 	\Huge Děkuji za pozornost.
 \end{frame}
-
-
-
-
-
 \end{document}
 \endinput
 
