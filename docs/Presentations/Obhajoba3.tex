@@ -12,7 +12,7 @@
   again covered={\opaqueness<1->{15}}}
 
 \title{\texttt{\LARGE Dvoukanálový USB osciloskop}}
-\subtitle{ Obhajoba DMP }
+\subtitle{ DMP 2019/18 }
 \author{ Adam Verner\footnote{\texttt{vernead15@sps-prosek.cz}}}
 
 \begin{document}
@@ -32,6 +32,51 @@
 		\end{itemize}
 	\end{frame}
 
+\section{methodology}
+
+	\begin{frame}{Creation}
+		\includegraphics[width=0.9\paperwidth]{Iterations.png}
+	\end{frame}
+
+	\begin{frame}{Tests}
+
+		Pros
+		\begin{itemize}
+			\item validation
+			\item Fast development
+			\item less errors
+			\item detailed specifiaction
+			\item less bugs
+		\end{itemize}
+
+		Cons
+		\begin{itemize}
+			\item more work
+			\item not bulletproof
+		\end{itemize}
+
+	\end{frame}
+	
+
+	\begin{frame}{Mock}
+
+		\begin{columns}[onlytextwidth,T]
+		\column{\dimexpr\linewidth-30mm-5mm}
+			\begin{itemize}
+				\item different programming paradigm
+				\item different language
+				\item creates standard for different devices	
+			\end{itemize}
+
+	      \column{30mm}
+	      \includegraphics[width=0.2\paperwidth]{Dummy.png}
+
+	    \end{columns}
+
+	\end{frame}
+
+
+
 \section{Hardware}
 
 %	\begin{frame}{FPGA}
@@ -43,10 +88,6 @@
 %		\includegraphics[width=\paperwidth]{adc_board.jpg}
 %	\end{frame}
 
-	\begin{frame}{Hardware topology}
-		\includegraphics[width=0.9\paperwidth]{Topology.png}
-	\end{frame}
-
 	\begin{frame}{Properties}
 		\begin{itemize}
 			\item 50 MSPS
@@ -55,19 +96,14 @@
 			\item 100Mb sample memmory
 			\item upto 460,800 baud
 		\end{itemize}
+	\end{frame}	
+
+	\begin{frame}{Hardware topology}
+		\includegraphics[width=0.9\paperwidth]{Topology.png}
 	\end{frame}
 
 
 \section{Firmware}
-	\begin{frame}{Firmware}
-		\begin{itemize}
-			\item system
-		\end{itemize}
-	\end{frame}
-
-	\begin{frame}
-		\includegraphics[width=1\paperwidth]{Firmware.png}
-	\end{frame}
 
 	\begin{frame}{Firmware}
 		\begin{itemize}
@@ -76,6 +112,11 @@
 			\item tests
 		\end{itemize}
 	\end{frame}
+
+	\begin{frame}{Topology}
+		\includegraphics[width=0.98\paperwidth]{Firmware.png}
+	\end{frame}
+
 
 \section{PC APP}
 	\begin{frame}{What can we do}
@@ -91,6 +132,13 @@
 	\begin{frame}{Structure}
 		\includegraphics[width=0.9\paperwidth]{SWlayers.png}
 	\end{frame}
+
+	
+	\begin{frame}{APP}
+		\includegraphics[width=0.965\paperwidth]{Application.png}
+	\end{frame}
+		
+
 
 
 
